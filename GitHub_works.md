@@ -38,6 +38,6 @@ $ git add .
 $ git config --global user.name "username"
 $ git config --global user.email "user email"
 $ git commit -m "commit message"
-$ git remote add origin "github repository link"
+$ git remote add origin "github repository website link"
 $ git push -u origin master
 </pre>
