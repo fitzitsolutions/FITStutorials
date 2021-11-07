@@ -52,5 +52,12 @@ GitKraken
 # commands
 
 <pre>
+create repo
+git status
+git clone
+git status
+git log
+git add
 git commit -a -m "commit message"
+git push
 </pre>
