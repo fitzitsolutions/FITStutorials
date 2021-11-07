@@ -12,7 +12,7 @@ git config --global user.name "username"
 git clone git clone git@github.com:"username"/"repo"
 git status
 git log
-<pre>
+</pre>
 
 ## Edit your files
 <pre>
