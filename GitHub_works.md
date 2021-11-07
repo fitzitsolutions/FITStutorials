@@ -22,7 +22,7 @@ vim whateverfile.txt
 ## Commit your changes locally
 <pre>
 git commit -a -m "message"
-</pre
+</pre>
 
 ## Send updates to GitHub
 <pre>
