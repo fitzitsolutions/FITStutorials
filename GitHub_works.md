@@ -9,7 +9,7 @@ git config --global user.name "username"
 ## Download your repo project
 ### make sure you use the git protocol
 <pre>
-git clone git clone git@github.com:<username>/<repo>
+git clone git clone git@github.com:\<username\>\/\<repo\>
 git status
 git log
 git commit -a -m "message"
