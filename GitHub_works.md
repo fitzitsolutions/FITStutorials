@@ -7,6 +7,8 @@
 echo "# FITStutorials" >> README.md
 git init
 git add README.md
+OR
+git add . (for entire directory)
 git commit -m "first commit"
 git branch -M main
 git remote add origin https://github.com/fitzitsolutions/FITStutorials.git
