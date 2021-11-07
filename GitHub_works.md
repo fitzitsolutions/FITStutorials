@@ -60,4 +60,8 @@ git log
 git add
 git commit -a -m "commit message"
 git push
+
+git fetch
+git pull
+# use merge when it throws errors
 </pre>
