@@ -1,3 +1,26 @@
+# BLUF (bottom line up front):
+
+## Set your local machine with globals
+<pre>
+git config --global user.email "email@address.com"
+git config --global user.name "username"
+</pre>
+
+## Download your repo project
+### make sure you use the git protocol
+<pre>
+git clone git clone git@github.com:<username>/<repo>
+git status
+git log
+git commit -a -m "message"
+</pre
+
+## Send updates to GitHub
+<pre>
+git status
+git push
+</pre>
+
 # HOW GIT WORKS WITH UBUNTU
 
 ## Directions from the GitHub site (new repository)
