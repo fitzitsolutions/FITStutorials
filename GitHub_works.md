@@ -33,9 +33,8 @@ git push
 <br>
 <br>
 <hr>
-# HOW GIT WORKS WITH UBUNTU
 
-## Directions from the GitHub site (new repository)
+# Directions from the GitHub site (new repository)
 
 ### …or create a new repository on the command line
 <pre>
@@ -57,17 +56,19 @@ git branch -M main
 git push -u origin main
 </pre>
 
-## Directions from YouTube
+<br><br><hr>
 
-### https://www.youtube.com/watch?v=_kAV059yZ_s
+# Directions from YouTube
 
-### Install Git
+## https://www.youtube.com/watch?v=_kAV059yZ_s
+
+## Install Git
 
 <pre>
 $ sudo apt get install git
 </pre>
 
-### Pushing to Git
+## Pushing to Git
 <pre>
 $ git init
 $ git status
@@ -79,12 +80,16 @@ $ git remote add origin "github repository website link"
 $ git push -u origin master
 </pre>
 
-# GUI for git
+<br><br><hr>
+
+# Extra Notes
+
+## GUI for git
 
 SourceTree
 GitKraken
 
-# commands
+## commands
 
 <pre>
 create repo
