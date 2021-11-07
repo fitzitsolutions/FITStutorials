@@ -86,7 +86,7 @@ $ git push -u origin master
 
 ## GUI for git
 
-SourceTree
+SourceTree <br>
 GitKraken
 
 ## commands
