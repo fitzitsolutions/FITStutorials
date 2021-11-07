@@ -30,6 +30,15 @@ git status
 git push
 </pre>
 
+## Add files to local computer, then add to GitHub repo
+<pre>
+git add *
+OR
+git add file.txt
+git commit -a -m "message"
+git push
+</pre>
+
 <br>
 <br>
 <hr>
