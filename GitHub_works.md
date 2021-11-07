@@ -30,6 +30,9 @@ git status
 git push
 </pre>
 
+<br>
+<br>
+<hr>
 # HOW GIT WORKS WITH UBUNTU
 
 ## Directions from the GitHub site (new repository)
