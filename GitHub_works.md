@@ -12,6 +12,15 @@ git config --global user.name "username"
 git clone git clone git@github.com:"username"/"repo"
 git status
 git log
+<pre>
+
+## Edit your files
+<pre>
+vim whateverfile.txt
+</pre>
+
+## Commit your changes locally
+<pre>
 git commit -a -m "message"
 </pre
 
