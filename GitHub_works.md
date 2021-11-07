@@ -48,3 +48,9 @@ $ git push -u origin master
 
 SourceTree
 GitKraken
+
+# commands
+
+<pre>
+git commit -a -m "commit message"
+</pre>
