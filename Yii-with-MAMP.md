@@ -124,8 +124,15 @@ Then do the same to grant privileges.
 <pre>
 GRANT ALL ON yiip4.* TO 'username'@'localhost' IDENTIFIED BY 'password’;
 FLUSH PRIVILEGES;
+</pre>
+
+<br>
+If you're in CLI, you may need an exit statement to leave MySQL.
+<br>
+
+<pre>
 EXIT;
-</pre
+</pre>
 
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
