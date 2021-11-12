@@ -2,6 +2,19 @@
 
 ## Using a MacBook Pro
 
+### DATABASE CONFIG - main-local.php (database config)
+
+<pre>
+'db' => [
+            'class' => 'yii\db\Connection',
+            // changed from localhost to 127.0.0.1
+            'dsn' => 'mysql:host=localhost;port=8889;dbname=yiip2;unix_socket=/Applications/MAMP/tmp/mysql/mysql.sock',
+            'username' => 'admin',
+            'password' => 'adminadmin',
+            'charset' => 'utf8',
+        ],
+</pre
+
 ### MIGRATE ERROR 1 - MySQL Connection Refused
 
 <pre>
