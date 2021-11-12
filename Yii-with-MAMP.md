@@ -2,6 +2,25 @@
 
 ## Using a MacBook Pro
 
+### PHP INIT - start your website
+Use 'php init' to gt the website started
+<br>
+this will automatically take care of yii requirements
+<br>
+<pre>
+yiip2 % php init
+Yii Application Initialization Tool v1.0
+
+Which environment do you want the application to be initialized in?
+
+  [0] Development
+  [1] Production
+
+  Your choice [0-1, or "q" to quit] 0
+
+  Initialize the application under 'Development' environment? [yes|no] yes
+</pre
+
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
 <br>
