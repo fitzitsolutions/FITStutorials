@@ -77,7 +77,7 @@ For me, the {app directory} is the one described above
         ],
 </pre>
 
-### MIGRATE ERROR 1 - MySQL Connection Refused
+### EXAMPLE MIGRATE ERROR 1 - MySQL Connection Refused
 In a terminal window
 <br>
 navigate to your project's base directory
@@ -88,7 +88,9 @@ For me, the {app directory} is the one described above
 <br>
 type './yii migrate'
 <br>
-If the configuration is incorrect from the previous step, an error will show:
+If the configuration is incorrect from the previous step, an error will show
+<br>
+This is from an invalid Port entry listed above
 <br>
 
 <pre>
@@ -110,8 +112,10 @@ Array
 
 
 
-### MIGRATE ERROR 2 - MySQL no such file or directory
+### EXAMPLE MIGRATE ERROR 2 - MySQL no such file or directory
 In a terminal window
+<br>
+This error will show if you haven't included the socket information above:
 <br>
 
 <pre>
@@ -132,7 +136,7 @@ Array
 </pre>
 
 
-### MIGRATE ERROR 3 - MySQL access denied with password
+### EXAMPLE MIGRATE ERROR 3 - MySQL access denied with password
 In a terminal window
 <br>
 
