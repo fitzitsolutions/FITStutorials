@@ -267,5 +267,5 @@ If the migration was successful...
 <br>
 you will see two new tables in your database
 <br>
-1. Migration
-2. User
+1. Migration <br>
+2. User <br>
