@@ -4,7 +4,9 @@
 
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
+<br>
 you can add that, and the MAMP port to 
+<br>
 {app directory}/common/config/main-local.php
 <pre>
 'db' => [
