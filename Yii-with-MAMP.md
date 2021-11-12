@@ -262,3 +262,10 @@ Apply the above migrations? (yes|no) [no]:yes
 
 Migrated up successfully.
 </pre>
+<br>
+If the migration was successful...
+<br>
+you will see two new tables in your database
+<br>
+1. Migration
+2. User
