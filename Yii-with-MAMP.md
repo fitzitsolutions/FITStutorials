@@ -112,6 +112,14 @@ OR
 <br>
 you can create it through mysql commands
 <br>
+for phpMyAdmin, just use the GUI, and click 'new'
+<br>
+for CLI, use:
+<br>
+create database yiip4;
+<br>
+Then do the same to grant privileges.
+<br>
 
 <pre>
 GRANT ALL ON yiip4.* TO 'username'@'localhost' IDENTIFIED BY 'password’;
