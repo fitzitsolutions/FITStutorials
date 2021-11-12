@@ -3,7 +3,9 @@
 ## Using a MacBook Pro
 
 ### DATABASE CONFIG - main-local.php (database config)
-
+Mac needs a socket for MySQL... 
+you can add that, and the MAMP port to 
+{app directory}/common/config/main-local.php
 <pre>
 'db' => [
             'class' => 'yii\db\Connection',
@@ -13,7 +15,7 @@
             'password' => 'adminadmin',
             'charset' => 'utf8',
         ],
-</pre
+</pre>
 
 ### MIGRATE ERROR 1 - MySQL Connection Refused
 
