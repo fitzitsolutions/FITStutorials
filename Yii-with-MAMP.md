@@ -105,6 +105,20 @@ Which environment do you want the application to be initialized in?
   Initialize the application under 'Development' environment? [yes|no] yes
 </pre>
 
+### CREATE A DATABASE
+this can be done with phpMyAdmin through MAMP
+<br>
+OR
+<br>
+you can create it through mysql commands
+<br>
+
+<pre>
+GRANT ALL ON yiip4.* TO 'username'@'localhost' IDENTIFIED BY 'password’;
+FLUSH PRIVILEGES;
+EXIT;
+</pre
+
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
 <br>
