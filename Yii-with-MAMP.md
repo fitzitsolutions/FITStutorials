@@ -44,6 +44,8 @@ Composer % sudo cp composer.phar /usr/local/bin/composer
 
 ### CHECK COMPOSER - did it install correctly?
 shows the man page for Composer
+<br>
+Simply type composer into the terminal...
 <!-- 
 ![Composer](/images/composer2.png "ComposerInstall")
 -->
