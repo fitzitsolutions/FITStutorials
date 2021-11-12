@@ -2,6 +2,43 @@
 
 ## Using a MacBook Pro
 
+### INSTALL COMPOSER
+In a terminal window
+<br>
+navigate to where you would like to download Composer
+<br>
+...I use ~/Downloads/Composer
+<br>
+If you don't have that directory, just create it.
+<br>
+Type: Composer % curl -s http://getcomposer.org/installer | php
+<br>
+<pre>
+Composer % curl -s http://getcomposer.org/installer | php
+All settings correct for using Composer
+Downloading...
+
+Composer (version 2.1.12) successfully installed to: /Users/development/Composer/composer.phar
+Use it: php composer.phar
+</pre>
+
+### GIVE CLI ACCESS TO COMPOSER
+By default, Macs don't have a /usr/local/bin folder available...
+...so just make one
+<pre>
+bin % cd /usr/local
+local % sudo mkdir bin
+</pre>
+<br>
+Now navigate to where you downloaded composer...
+<br>
+and copy composer to /usr/local/bin/composer
+<br>
+<pre>
+% cd ~/Downloads/Composer
+Composer % sudo cp composer.phar /usr/local/bin/composer
+</pre>
+
 ### CREATE NEW PROJECT - use Composer
 In a terminal window
 <br>
