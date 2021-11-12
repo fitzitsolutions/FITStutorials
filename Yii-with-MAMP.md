@@ -19,7 +19,7 @@ Which environment do you want the application to be initialized in?
   Your choice [0-1, or "q" to quit] 0
 
   Initialize the application under 'Development' environment? [yes|no] yes
-</pre
+</pre>
 
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
