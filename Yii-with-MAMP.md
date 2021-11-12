@@ -2,11 +2,35 @@
 
 ## Using a MacBook Pro
 
+### CREATE NEW PROJECT - use Composer
+In a terminal window
+<br>
+get to where you'd like your root directory to reside.
+<br>
+For me, it was:
+<br>
+/Users/development/Sites/
+<br>
+...in other words, all my development websites will go in the folder 'Sites'
+<br>
+
+<pre>
+Sites % composer create-project --prefer-dist yiisoft/yii2-app-advanced yiip2
+Creating a "yiisoft/yii2-app-advanced" project at "./yiip2"
+Installing yiisoft/yii2-app-advanced (2.0.43)
+  - Installing yiisoft/yii2-app-advanced (2.0.43): Extracting archive
+Created project in /Users/development/Sites/yiip2
+Loading composer repositories with package information
+Updating dependencies
+Lock file operations: 85 installs, 0 updates, 0 removals
+</pre>
+
 ### PHP INIT - start your website
 Use 'php init' to gt the website started
 <br>
 this will automatically take care of yii requirements
 <br>
+Enter into your application directory and:
 <pre>
 yiip2 % php init
 Yii Application Initialization Tool v1.0
