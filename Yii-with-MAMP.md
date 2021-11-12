@@ -235,4 +235,30 @@ Array
     [1] => 1045
     [2] => Access denied for user 'admin'@'localhost' (using password: YES)
 )
-</pre
+</pre>
+
+### MIGRATION SUCCESSFUL - if there were no errors like the ones above
+
+<pre>
+yiip4 % ./yii migrate
+Yii Migration Tool (based on Yii v2.0.43)
+
+Creating migration history table "migration"...Done.
+Total 2 new migrations to be applied:
+	m130524_201442_init
+	m190124_110200_add_verification_token_column_to_user_table
+
+Apply the above migrations? (yes|no) [no]:yes
+*** applying m130524_201442_init
+    > create table {{%user}} ... done (time: 0.028s)
+*** applied m130524_201442_init (time: 0.030s)
+
+*** applying m190124_110200_add_verification_token_column_to_user_table
+    > add column verification_token string NULL DEFAULT NULL to table {{%user}} ... done (time: 0.032s)
+*** applied m190124_110200_add_verification_token_column_to_user_table (time: 0.033s)
+
+
+2 migrations were applied.
+
+Migrated up successfully.
+</pre>
