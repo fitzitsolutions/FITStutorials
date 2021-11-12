@@ -26,6 +26,8 @@ Lock file operations: 85 installs, 0 updates, 0 removals
 </pre>
 
 ### PHP INIT - start your website
+In a terminal window
+<br>
 Use 'php init' to gt the website started
 <br>
 this will automatically take care of yii requirements
@@ -63,6 +65,8 @@ you can add that, and the MAMP port to
 </pre>
 
 ### MIGRATE ERROR 1 - MySQL Connection Refused
+In a terminal window
+<br>
 
 <pre>
 yiip2 % ./yii migrate
@@ -82,6 +86,8 @@ Array
 </pre>
 
 ### MIGRATE ERROR 2 - MySQL no such file or directory
+In a terminal window
+<br>
 
 <pre>
 yiip2 % ./yii migrate
@@ -102,6 +108,9 @@ Array
 
 
 ### MIGRATE ERROR 3 - MySQL access denied with password
+In a terminal window
+<br>
+
 <pre>
 yiip2 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
