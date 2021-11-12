@@ -1,4 +1,7 @@
 # INSTALLING YII FRAMEWORK ON MAMP
+This tutorial assumes you have already installed MAMP on your Mac.
+<br>
+Database, website directories, and ports are already established.
 
 ## Using a MacBook Pro
 
