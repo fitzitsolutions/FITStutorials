@@ -13,6 +13,9 @@ For me, it was:
 <br>
 ...in other words, all my development websites will go in the folder 'Sites'
 <br>
+Now type: composer create-project --prefer-dist yiisoft/yii2-app-advanced yiip2
+<br>
+...where yiip2 can be changed to any name for your project.
 
 <pre>
 Sites % composer create-project --prefer-dist yiisoft/yii2-app-advanced yiip2
@@ -33,6 +36,10 @@ Use 'php init' to gt the website started
 this will automatically take care of yii requirements
 <br>
 Enter into your application directory and:
+<br>
+type 'php init'
+<br>
+
 <pre>
 yiip2 % php init
 Yii Application Initialization Tool v1.0
@@ -53,6 +60,12 @@ Mac needs a socket for MySQL...
 you can add that, and the MAMP port to 
 <br>
 {app directory}/common/config/main-local.php
+<br>
+For me, the {app directory} is the one described above
+<br>
+"/Users/development/Sites/"
+<br>
+
 <pre>
 'db' => [
             'class' => 'yii\db\Connection',
@@ -66,6 +79,16 @@ you can add that, and the MAMP port to
 
 ### MIGRATE ERROR 1 - MySQL Connection Refused
 In a terminal window
+<br>
+navigate to your project's base directory
+<br>
+For me, the {app directory} is the one described above
+<br>
+"/Users/development/Sites/yiip2"
+<br>
+type './yii migrate'
+<br>
+If the configuration is incorrect from the previous step, an error will show:
 <br>
 
 <pre>
@@ -84,6 +107,8 @@ Array
     [2] => Connection refused
 )
 </pre>
+
+
 
 ### MIGRATE ERROR 2 - MySQL no such file or directory
 In a terminal window
