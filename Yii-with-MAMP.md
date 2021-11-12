@@ -2,7 +2,7 @@
 
 ## Using a MacBook Pro
 
-## MIGRATE ERROR 1
+### MIGRATE ERROR 1 - MySQL Connection Refused
 
 <pre>
 yiip2 % ./yii migrate
@@ -21,7 +21,7 @@ Array
 )
 </pre>
 
-## MIGRATE ERROR 2
+### MIGRATE ERROR 2 - MySQL no such file or directory
 
 <pre>
 yiip2 % ./yii migrate
@@ -41,7 +41,7 @@ Array
 </pre>
 
 
-## MIGRATE ERROR 3
+### MIGRATE ERROR 3 - MySQL access denied with password
 <pre>
 yiip2 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
