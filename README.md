@@ -3,4 +3,8 @@
 ## TUTORIALS
 
 1. [GitHub_works.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/GitHub_works/GitHub_works.md) - Git Process using Ubuntu
+<<<<<<< HEAD
 2. [Yii-with-MAMP.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/Yii-with-MAMP/Yii-with-MAMP.md) - Installing Yii on MAMP
+=======
+2. [Tii-with-MAMP.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/Yii-with-MAMP/Yii-with-MAMP.md) - Installing Yii on MAMP
+>>>>>>> main
