@@ -1,7 +1,10 @@
 #!/bin/bash
 
+echo "USAGE:" 
+echo "1. ensure execution permissions on this shell script"
+echo "2. type: ./changeperms.sh <website>"
 echo "This script will:"
-echo "1. CHANGE PERMISSIONS TO /var/www/html/$1/public_html"
+echo "CHANGE PERMISSIONS TO /var/www/html/$1/public_html"
 echo ""
 
 read -p "Do you want to run this shell? [y/n]" answer
