@@ -190,38 +190,80 @@ sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-availab
 </pre>
 <br>
 
-#### 
+#### CREATE WEB DIRECTORIES [APACHE]
+<pre>
 sudo mkdir -p /var/www/html/example.com/{public_html,logs}
-
 sudo chown -R www-data:www-data /var/www/html/example.com/public_html
-
 sudo chmod -R 755 /var/www/html/example.com/public_html
+</pre>
+<br>
 
+#### ENABLE WEBSITE [APACHE]
+<pre>
 sudo a2ensite example.com
+</pre>
+<br>
 
+#### OPTIONAL: DISABLE DEFAULT SITE [APACHE]
+<pre>
 sudo a2dissite 000-default.conf
+</pre>
+<br>
 
+#### RESTART APACHE [APACHE]
+<pre>
 sudo systemctl reload apache2
+</pre>
+<br>
 
+#### CONFIGURE MARIADB [MYSQL]
+<pre>
 sudo mysql_secure_installation
+</pre>
+<br>
 
+<hr>
+
+## OPTIONAL: PLAY AROUND WITH PHP AND MYSQL
+
+#### CREATE A DATBASE [MYSQL]
+<pre>
 sudo mysql -u root
 CREATE DATABASE webdata;
 GRANT ALL ON webdata.* TO 'webuser' IDENTIFIED BY 'password';
-
-CREATE USER 'user'@'localhost' IDENTIFIED BY 'P@ssW0rd';
+CREATE USER 'user'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL ON *.* TO 'user'@'localhost';
+</pre>
+<br>
 
-/etc/php/7.2/apache2/php.ini
+#### CREATE PHP CONFIGURATION FILE [PHP]
+<pre>
+vim /etc/php/7.2/apache2/php.ini
+</pre>
+<br>
+<pre>
 error_reporting = E_COMPILE_ERROR | E_RECOVERABLE_ERROR | E_ERROR | E_CORE_ERRORi
 max_input_time = 30
 error_log = /var/log/php/error.log
+</pre>
+<br>
 
+#### CREATE PHP LOGS AND RESTART APACHE [PHP]
+<pre>
 sudo mkdir /var/log/php
 sudo chown www-data /var/log/php
 sudo systemctl restart apache2
+</pre>
+<br>
 
-/var/www/html/example.com/public_html/phptest.php
+#### CREATE A TEST WEBPAGE FOR PHP [PHP]
+```
+vim /var/www/html/example.com/public_html/phptest.php
+```
+<br>
+
+```
+
 <html>
 <head>
     <title>PHP Test</title>
@@ -246,14 +288,34 @@ sudo systemctl restart apache2
 </body>
 </html>
 
+```
+
+#### CHECK THE STATUS OF APACHE [APACHE]
+<pre>
 sudo systemctl status apache2
+</pre>
+<br>
 
-[end of web build]
 
+## [end of web build]
 
-[email build]
+<br>
+<br>
 
-[BUILD THE DNS RECORDS on your Domain Host]
+<hr>
+
+## THIS IS THE END OF THE WEB BUILD
+### THE NEXT SECTION IS FOR EMAIL SERVERS
+
+<hr>
+<br>
+<br>
+
+## EMAIL SERVER BUILD [EMAIL]
+<br>
+
+#### BUILD THE DNS RECORDS [DNS]
+<pre>
 A record - IP address
 A record - mail. IP address
 AAAA record - IP address
@@ -263,15 +325,21 @@ MX record - mail. to URL
 TXT record - DKIM entry
 Dkim._domainkey and add the encryption 
 TXT record - v=spf1 entry
-v=spf1 mx mx:fitz-sec.com ip4:69.164.199.158 ptr:fitz-sec.com include:fitz-sec.com ~all\009
+v=spf1 mx mx:ssite.com ip4:110.10.10.110 ptr:site.com include:site.com ~all\009
 TXT record - google site validation
 Add to the Webmaster Tools dashboard and find the entry
 CNAME record - WWW to URL
+</pre>
+<br>
 
-[INSTALL GZIP]
+#### INSTALL GZIP [EMAIL]
+<pre>
 sudo apt-get install gzip
+</pre>
+<br>
 
-[DOWNLOAD LATEST IREDMAIL INSTALLER]
+#### DOWNLOAD LATEST IREDMAIL INSTALLER [EMAIL]
+<pre>
 su root
 mkdir /root/iredmail
 cd /root/iredmail
@@ -280,17 +348,26 @@ tar zxf iRedMail…
 cd /root/iredmail/iRedMail…
 bash iRedMail.sh
 # the GUI will guide you through the installation
+</pre>
+<br>
 
-[SSL CERT]
+#### INSTALL SSL CERTIFICATES [EMAIL]
 Obtain a Let’s Encrypt cert for free
+<br>
 https://certbot.eff.org/lets-encrypt/ubuntufocal-apache
+<br>
 Install the cert to all of the mail services
+<br>
 https://docs.iredmail.org/letsencrypt.html
+<br>
+<pre>
 mv /etc/ssl/certs/iRedMail.crt{,.bak}       # Backup. Rename iRedMail.crt to iRedMail.crt.bak
 mv /etc/ssl/private/iRedMail.key{,.bak}     # Backup. Rename iRedMail.key to iRedMail.key.bak
 ln -s /etc/letsencrypt/live/mail.mydomain.com/fullchain.pem /etc/ssl/certs/iRedMail.crt
 ln -s /etc/letsencrypt/live/mail.mydomain.com/privkey.pem /etc/ssl/private/iRedMail.key
+</pre>
+<br>
 
-[TRANSFER ALL EMAIL ACCOUNTS FROM OLD SERVER]
+### IF NEEDED, TRANSFER ALL EMAIL ACCOUNTS FROM OLD SERVER [EMAIL]
 
 [end email build]
