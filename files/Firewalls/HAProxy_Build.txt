@@ -1,0 +1,111 @@
+PFSENSE HAPROXY
+
+[PACKAGE MANAGER]
+Install ACME, and HAPROXY
+
+[OPTIONAL:  ACCESSING PFSENSE PUBLICLY]
+NOTE:  you can make a firewall rule to only allow access to PFSense from an alias
+Can also set this up to allow reverse-proxy for local access → NAT Reflection turned on
+System → Advanced → Firewall & NAT → NAT Reflection Mode → Pure NAT
+
+[CLOUDFLARE - CREATE AND FIND INFORMATION FOR CONNECTION]
+NOTE:  you have to jump around to find all the API keys/tokens
+KEY:  url.com dashboard, click “Get your API Token” (bottom right) → API Tokens
+TOKEN:  url.com dashboard, click “Get your API Token” (bottom right) → create one
+ZONE ID:  url.com dashboard → create token, use the dropdown for the url.com
+ACCOUNT ID:  url.com dashboard
+
+Options for the CloudFlare dropdown menu - select DNS-Cloudflare
+Key: Refers to the Global API Key from CloudFlare account
+Email: E-mail used to create your CloudFlare account
+Token: Refers to the API Token you generated on CloudFlare
+Account ID: Refers to the Account ID from CloudFlare
+Zone ID: Refers to the Zone ID also from CloudFlare
+Enable DNS alias mode: Leave blank
+Enable DNS domain alias mode: Leave blank
+
+[PFSENSE SETUP]
+NOTE:  you have to set up the front-end and the back-end… but back-end first.
+
+[CREATE CERTS]
+Services → Acme Certifications
+General Tab → check box for Cron
+Account Keys Tab → create LetsEncrypt account (used to create all other certs)
+Certificates Tab → create certificate using CloudFlare dropdown
+
+[BACK-END]
+Services → HAProxy → Backend Tab
+NOTE:  if they’re not in use, they will be greyed out
+Add Server
+Name → no spaces are allowed
+Server List → fill in Address and Port 443, encryption checked, SSL checks not checked
+OR… Server List → Address, Port 80, encryption not checked, SSL, checks not checked
+Server List → use the drop downs to select your CA, and Certificate
+All The Rest → leave at default
+
+
+[FRONT-END]
+Services → HAProxy → Frontend Tab
+Name → no spaces allowed
+Description → whatever you want
+Status → Active
+External Address → Port 443
+Default backend ACL → will match each host to a value → name, host matches, values
+ACRONYMS:  Server Name Information (SNI), Common Name (CN)
+Actions → use backend, parameters, condition and names → drop down to the backend name
+NOTE:  the redirection (port to port) happens in the External Address area
+SSL Offloading → very important → Additional Certificates → add certs to table
+NOTE:  make sure ‘Conditions and names’ matches the name of the ACL name
+Certificate → selects a default cert (if nothing else matches, it sends this one)
+Check → Add ACL for certificates Subject Alternative Names
+Additional Certificates → selects based on SNI
+Check → Add ACL for certificates Subject Alternative Names
+NOTE:  add others using the ACL and down arrow in the Table box (ensure spelling in value)
+ADD MORE:  3 steps → Backend ACL, SSL Offloading, Additional Certs
+
+[DIFFERENT PORT]
+Frontend → Name, Description, External address (fill in different port), check SSL offloading
+Cert → use dropdown to select your cert
+Add’l Certs → no need, but you can check ‘Add ACL for CSA names’
+Default Backend → dropdown to your default Backend name
+
+[RENEWALS]
+Services → Acme → Settings → Global Tab → check Cron Entry
+When renewing the certificates, you may have to:
+Certificates Tab → Actions List → Table → Add → Mode: Enable, Command: restart service
+NOTE:  command is listed above the Table section, use Method: Shell Command
+
+[FINDS AFTER INSTALLATION]
+Umm…. make sure HAProxy is turned on
+Websites will use either 80, or 443.  If the server isn’t configured for 443, it gives 503 Service Unavailable.  That’s an indicator that the server can’t serve the page.
+Need to figure out the CNAME… putting www.url.com doesn’t work yet
+CloudFlare is issuing their own cert… that’s good!
+
+
+
+TROUBLESHOOTING
+
+Trying to get it to respond after a database change.
+NOTE:  I keep getting Error 504 Ray ID: 6409a980cbfa0554 • 2021-04-16 01:32:50 UTCGateway time-out
+Within CloudFlare:
+Turned off ‘HTTP/3 (with QUIC)’ - same result
+Turned off ‘Always use HTTPS’ - same result
+Turned on Dev Mode - different behavior at first, but still won’t finish wordfence
+It’s likely caused because each of the new wordpress installs were done through port 80, so every database entry is http.  When a browser requests the site, it’s all 443 through cloudflare.  So if I install the site with https, and things are hard coded with https, everything should be solved.
+
+NOTES:
+Each time a cert is renewed, it requires a restart of HAProxy.  Details are listed in the section described below.  Once the script is created, you’ll need to add it into the settings for each of the cert entries.  This can be done under: 
+SERVICES → ACME → CERTIFICATES → [select cert] → ACTION LIST.
+
+/usr/local/etc/rc.d/haproxy.sh → create the script here, and run it using the ACTION LIST table.
+SERVICES → ACME → GENERAL SETTINGS → enable the Cron Entry check box
+
+Health check is not needed on each of the entries
+
+You can add subnets inside of your network using HAProxy, and a DNS entry.  Create the wildcard certificate, and the frontend/backend… then add a DNS entry for it.  Assuming the first steps are done, add a DNS entry by:
+SERVICES → DNS RESOLVER → HOST OVERRIDE (table on bottom)
++ADD → enter subdomain name, domain, PFSense IP (resolves to itself), and description
+
+You can create a public DNS entry for a private IP address (PFSense IP) so that when people VPN into the system, they can still get to resources.
+HAPROXY → add the subnet entry to the Frontend ACL, and use a Backend from dropdown.
+The wildcard certificate selected already at the bottom will take care of business.
