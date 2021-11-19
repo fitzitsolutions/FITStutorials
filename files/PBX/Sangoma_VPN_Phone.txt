@@ -1,0 +1,63 @@
+FreePBX & SANGOMA VPN PHONE - SERVER AND PHONE SETUP
+
+QUICK CHECKLIST (small font indicates one-time first setup):
+NETWORK FIREWALL → Port forward UDP 1194 & TCP 1443 to FreePBX
+REFERENCE:  https://wiki.freepbx.org/display/PHON/VPN+Setup 
+SELF SIGNED CERT:  Admin Pro → HTTPS Setup → select cert, install
+HTTP(S) PROVISIONING:  PBX → Admin Pro → Provisioning Protocols → HTTP(S) Authentication = BOTH (creates user:pass)
+PBX → Applications → Extensions → Add Extension Wizard
+PBX → Admin → User Manager → Edit auto created user → VPN = Yes
+PBX → Admin Pro → VPN Server → Turn on VPN, then edit the clients (assign address)
+PBX → Connectivity → Firewall → Hamburger Menu Services → Extra Services → OpenVPN Server = Internet/on, Local/on, Other/on
+PBX → EM → Firmware Manager → put the latest version in slot 1 and let it update the PBX (takes a while)
+PBX → EM → create template for VPN (duplicate standard, then change settings from below)
+PBX → EM → Extension Mapping → Map phone to the new extension & template
+PBX → EM → Extension Mapping → Edit the mapping, and add VPN client to the bottom
+SANGOMA PORTAL → Create Zero Touch Config (redirection)
+NOTE:  the user:pass is what is created under HTTP(S) PROVISIONING
+PHONE → Connect to PBX network to grab configs, then Factory Reset
+
+EXPANDED CHECKLIST:
+FIREWALL SETUP
+NAT Port forward 1194 and 1443 to the PBX server
+NOTE:  HTTPS provisioning is recommended (Admin Pro → HTTPS Setup)
+NOTE:  Sangoma S Series seeks provisioning 1st via DHCP by the Zero Conf server and finally mDNS.
+NOTE:  remote phones will use the WAN IP of your network
+PBX SERVER → Admin → User Management
+Find the auto generated user for your extension, and edit
+VPN TAB → Auto Create & Link → Yes (enabled)
+SUBMIT
+PBX SERVER → System Admin
+Need to set up the VPN
+Scroll down and select → VPN Server
+NOTE:  An install to the PBX server is required: System Admin Pro ($25)
+SETTINGS TAB:  Enabled → Yes
+SUBMIT
+CLIENTS TAB:  Edit the VPN extension
+OPENVPN CLIENT → ASSIGNED ADDRESS → select preferred IP (10.8.0.6)
+SUBMIT
+PHONE → Factory Default
+Sangoma Default:  admin:admin, also use the Zero Touch Configuration portal
+NOTE:  the user name and password are from the HTTPS protections
+MANAGEMENT → UPGRADES → Reset To Factory (click button)
+NOTE:  recommended to do this live with the end-user
+Unplug and pack up the phone
+PBX SERVER → ENDPOINT MANAGER
+HAMBURGER MENU → Extension Mapping
+Find and click on the mapped template if it exists
+NOTE:  if no mapping was done, you can create a map
+NOTE:  you can also use the template manager
+DEFAULT TEMPLATE → TASKS TAB → DUPLICATE
+NAME:  default_vpn (or whatever you desire
+NEW TEMPLATE → click on new template to edit
+GENERAL TAB → Default Internal Template → No (changed from Yes)
+GENERAL TAB → Default External Template → No (changed from Yes)
+GENERAL TAB → SIP Destination Address → External (changed)
+GENERAL TAB → Provisioning Protocol → HTTPS (changed)
+GENERAL TAB → Provisioning Address → External (changed)
+APPLY
+NOTE: That’s when it builds the TAR file to use for VPN
+EXTENSION MAPPING → Edit the VPN extension
+EDIT EXTENSION → Template → select new default_vpn
+EDIT EXTENSION → VPN Client → select the vpn extension
+APPLY → select Save and Rebuild Config(s)
