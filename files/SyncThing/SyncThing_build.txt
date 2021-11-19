@@ -1,0 +1,118 @@
+SyncThing can be installed as a plugin, but it is not the most efficient way to get things done.  Doing it this way will require configurations with nginx that are inefficient.  The better way to do it is to create a Jail in TrueNAS and assign an IP address using DHCP.  Then, simply install it via the command line interface for the Jail.
+
+Create Jail
+MAIN MENU → JAILS → add jail (you will have to choose a Pool for the Jail)
+Name:  SyncThing[add last octet of Jail’s IP], or name whatever you want
+Jail Type:  Default
+Release:  Choose the latest (on next menu, select DHCP, then Submit)
+Start Service, install syncthing
+You can use CLI (>SHELL) in the Jail, or SSH into it
+NOTE: if you use Jail CLI, you’ll need to install vim ($ pkg install vim)
+If you SSH, use ‘iocage’ to get into the jail (not if using Jail CLI)
+$ ssh root@TrueNAS-IP
+$ iocage console [Jail name]
+Update Packages
+$ pkg update
+Select yes when asked
+Install syncthing
+$ pkg install syncthing
+Select yes when asked
+NOTE: the syncthing user should be UID ‘983’ but take note of it
+Add options to syncthing using sysrc
+$ sysrc syncthing_enable=YES
+$ sysrc sshd_enable=”YES”
+NOTE:  you can confirm the settings on the bottom of the file /etc/rc.conf
+Add root login to SSH
+$ vim /etc/ssh/sshd_config
+Change “#PermitRootLogin no” to “PermitRootLogin yes”
+Change the root password on syncthing
+$ passwd root
+Change it to something good
+$ exit (to exit the console and back into the TrueNAS SSH)
+Exit the CLI and reboot the Jail via the TrueNAS GUI
+NOTE:  you can also restart the service with SSH ($ iocage restart [Jail name]
+Check the processes for syncthing and sshd
+Console into the Jail, or SSH using your new root:pass credentials
+$ top
+Use SSH forward so that your browser can reach the SyncThing GUI
+$ ssh -L 8000:127.0.0.1:8384 root@SyncThing-IP
+NOTE:  this forwards requests from your browser to the SSH connection
+Visit the SyncThing GUI via your browser:  http://localhost:8000
+Change settings in SyncThing upon first visit (errors are common on the GUI)
+Change SyncThing settings (top-right of browser window)
+GENERAL TAB:  Device Name to whatever you’d like (default is name Jail name)
+GUI TAB: GUI Listen Address: 0.0.0.0:8384 (so that the ssh -L isn’t needed)
+GUI AUTH USER:  Add a name and password to the server’s SyncThing
+CLICK:  select “Use HTPS for GUI”
+SAVE
+NOTE:  settings are saved in /usr/local/etc/syncthing/config.xml
+You are done with the SyncThing GUI for now
+TrueNAS GUI → Stop Jail and create a Mount Point for the files
+JAIL → drop down list for the Jail → STOP the Jail
+TRUENASE: Create a user for SyncThing to have permissions to a Dataset
+ACCOUNTS → USERS:  Create user
+FULL NAME:  syncthing[last octet of jail IP]
+USERNAME:  same as full name
+EMAIL:  optional
+PASSWORD:  something fairly strong
+USER ID:  This will be the UID noted above during SyncThing install
+NEW PRIMARY GROUP:  ensure this is checked
+All other defaults are fine
+SUBMIT
+STORAGE → POOLS:  Change Dataset privileges (create Dataset if needed)
+DATASET → THREE DOTS → edit permissions (do not use ACL)
+USER:  syncthing[last octet of jail IP] (same as user created before)
+GROUP:  syncthing[last octet of jail IP] (same as user created before)
+Check “Apply User” and “Apply Group”, All other defaults are fine
+SAVE
+TrueNAS GUI → Add the Mount Point to the Jail
+MAIN MENU → JAILS → drop down options for your SyncThing Jail
+MOUNT POINT → ACTIONS → drop down, click Add
+SOURCE:  The Dataset on TrueNAS
+DESTINATION:  Click mnt (this populates the field), and add a folder name
+SUBMIT
+TrueNAS GUI → Restart Jail by using the dropdown next to your Jail name
+You can check the Mount Point via the CLI (>SHELL)
+You can test permissions by adding and removing files (/mnt/foldername)
+SyncThing GUI → Add Folder in the SyncThing GUI
+Navigate to https://[SyncThing IP]:8384 (may remove default folder share)
+Click on “+Add Folder” button under title Folders
+GENERAL TAB:  Folder Label:  add any name
+GENERAL TAB:  Folder ID:  same name as Folder Label
+GENERAL TAB:  Folder Path:  type /mnt, then watch it populate, and add name
+FILE VERSIONING TAB:  change to ‘Simple File Versioning’ and change to 10
+SAVE
+NOTE:  this ensures all permissions are correct
+WINDOWS → SYNCTHING INSTALL
+Google: SyncThing download, use the x64 installer
+WINDOWS → Add a sync folder to the system
+Go to the server’s GUI, click on Actions → Show ID, then copy the text
+Open up the newly installed application
+Click on “+ Add Remote Device” on the bottom right of the application
+GENERAL TAB:  Device ID:  paste the copied ID
+GENERAL TAB:  Device Name:  can name it anything
+SHARING TAB:  Select the folders that were created (add if not there)
+NOTE:  if they are not present, use the application to add folders
+ADVANCED TAB:  Address:  tcp://[SyncThing IP]:22000
+SAVE
+SyncThing Server GUI, approve the new connection from generated from Windows
+Wait for a window to pop-up with “+Add Device / x Ignore”
+Select “+Add Device”
+GENERAL TAB:  Device Name:  name whatever you want
+All other defaults are fine
+SAVE
+NOTE:  services restart each time there is a save
+SyncThing Server GUI, approve new folders from Windows
+Wait for a window to pop-up with “Add / x Ignore” (one per folder)
+Select “Add”
+GENERAL TAB:  change the folder path to /mnt, then add a folder name
+NOTE:  the name should describe the windows folder sync
+NOTE:  after /mnt, you need to click on the root folder, then add name
+FILE VERSIONING TAB:  change to “Simple File Versioning” and change to 10
+SAVE
+Now wait for the syncronize… it may take a while depending on size
+DONE
+
+NOTE:  for additional security, when this process is complete, you can go back and disable the root login to SSH by reversing step 4.
+Change “PermitRootLogin yes” to “PermitRootLogin no”
+A Jail restart will be required

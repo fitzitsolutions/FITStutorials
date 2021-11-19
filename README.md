@@ -9,3 +9,4 @@
 5. [CentOS_notes.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/CentOS_Servers/CentOS_notes.md) - Old but maybe relevant CentOS server notes
 6. [Ubuntu_Server_Creation.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Ubuntu_Server_Build/Ubuntu_Server_Creation.md) - Build Ubuntu 20.4 Servers
 7. [PBX_build.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/PBX/PBX_build.txt) - FreePBX Server Build
+8. [Syncthing_build.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/SyncThing/SyncThing_build.txt) - SyncThing build on TrueNAS
