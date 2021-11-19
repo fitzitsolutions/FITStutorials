@@ -1,0 +1,644 @@
+FREE PBX INSTALL
+
+QUICK LIST OF DEFAULT ACTIONS:
+NOTE:  port forward must be enabled via NAT for TCP/UDP 5060-5260, and UDP 10000-20000 (See pictures below)
+1. Install 
+2. UPDATE: Run updates via CLI: ‘sudo yum -y update’ and ‘fwconsole ma upgradeall’ 
+3. Reboot
+4. Log into PBX, choose defaults on the Wizard
+5. EM → GLOBAL → add Internal Address (assigned via PFsense)
+6. EM → FIRMWARE MANAGER → add latest firmware to slot 1
+7. EM → BRANDS → SANGOMA → duplicate template and make default
+8. APPLICATIONS → EXTENSIONS → use quick add to make a new extension, then edit via the pencil
+9. EM → EXTENSION MAPPING → map extension to test phone, and factory reset phone
+	NOTE:  may need to add phone to Sangoma Portal
+10. PHONE → perform an echo test using *43
+11. CLEARLYIP → add module: https://kb.clearlyip.com/trunking/FreePBX-PBXact-Automated-Setup-with-Module.html
+12. OPTIONAL → ADMIN → SYSTEM ADMIN → Time Zone, Hostname,
+13. PREPEND → DIAL PATTERNS:  Prepend to 1702 to 7 digit, Prepend 1 to 10-digit, Prepend + to 11 digit
+14. EXTERNAL IP → create hostname on noip.com, enter hostname in EM/GLOBAL, and SETTINGS/ASTERISK SIP SETTINGS
+15. UPDATE → CLI → sudo yum update && fwconsole ma upgradeall
+
+
+NOTE:  20210801 - fail2ban was not working with a recent update on the systemadmin module.  This fixes it:
+/var/www/html/admin/modules/sysadmin/hooks/fail2ban-apache-config
+
+CLEARLYIP PHONE PROVISIONING
+1. Create a DNS entry (test lab, then production… can just change the DNS)
+2. Download the ClearlyIP Phone Module → CIP Portal → Support → Wiki → CIP Device Module → Installing Module
+3. Install Module to FreePBX (Download from web using the link on the previous step)
+4. Settings → ClearlyIP Devices → Module Settings
+MAIN TAB → Add FQDN of the DNS you set up (is this the local address?)
+Select HTTP (use HTTPS if you’ve set up letsencrypt)
+PROVISIONING TAB → add FQDN (is that the local address?)
+Provisioning Port → default 2580 (need to open it up in the FreePBX firewall - done soon)
+User Name / Password - randomly generated for each server
+HTTP (use HTTPS if you’ve set up letsencrypt)
+Default Image → choose Not_Registered.png
+SUBMIT → APPLY CONFIG
+5. Create Hotdesk Defaults Wizard → Enter default extension (Can log into the phone as different users or extensions)
+This is used to ensure 911 can still be called (only need to do this once)
+6. SETTINGS → Template Layouts → Add Template Layout
+GENERAL TAB:  Name ‘Default Beehive’ (or whatever you want)
+Primary Host → FQDN of the server (is that the local address?)
+Resync Time → Defaults to 24 hours (1440 minutes)
+PHONE SETTINGS TAB:  Line Label → set to Name
+Long Press Idle State → *80 (short press and long press for BLF - Feature code for Intercom) 
+Short Press when in use → * (transfer to voicemail)
+SUBMIT → APPLY CONFIG (may not be needed)
+7. Open Ports in Firewall → CONNECTIVITY → FIREWALL
+TRAY → SERVICES → CUSTOM SERVICES → CREATE NEW SERVICE
+Description → ClearlyIP Devices
+Protocol → TCP
+Port Range → 2579:2580
+SAVE
+Make sure it’s on the LOCAL zone
+8. Create Template for the phones
+SETTINGS → CLEARLYIP DEVICES
+MODEL LAYOUTS → +Add New Model
+Click → CIP270 (or whatever phone you’re using)
+Model Description → ‘Beehive 270’ (or whatever makes sense for the organization)
+Background Image → can upload whatever image you’d like
+LINE KEYS TAB:  There are 3 line keys, and nothing else…
+SUBMIT → APPLY CONFIG (may not be needed)
+9. Mapping
+SETTINGS → CLEARLYIP DEVICES → MENU SLIDE → MAPPINGS → Device Mapping
++Add Mapping (Extension, Contact 1, Default Beehive, MAC Address, Model 270 Beehive 270, account Registration 1)
+SUBMIT
+10. Phones (Manual, or with ClearlyIP Provisioning)
+Phone default admin:admin
+Use Template to find the Provision URL → paste to Config Server Path
+NOTE: devices.clearlyip.com (use for multiple phones) - can also use Option 66 TFTP - may need to request access
+NOTE: Default Passcode on phones for factory reset:  920383
+
+
+
+INITIAL INSTALL
+- USB Drive
+
+CREATE ACCOUNT 
+- The first screen will be to create a local admin user
+- this is seperate from the root password for installation
+
+FREEPBX ADMINISTRATION
+- Click on the little guy with the glasses
+- use the newly created user
+
+ACTIVATE PBX (Pop-up)
+- when presented with activation, go ahead and click ‘ACTIVATE’
+- if you have an old activation, you will be asked if you want to use that
+
+PORTAL ACCOUNT (Pop-up)
+- create a portal account
+- can go to ‘portal.sangoma.com’ to create a free account
+- log in with your new portal account
+- Verify all of your information, then activate with a location name
+- Say yes to update the modules
+- Wait for the downloads on the status popup
+- Don’t need to do the PBX Cloud
+- Don’t need to worry about the purchase of phones
+
+OTHER ADMIN SETUP
+- Select your language and timezone
+
+SMART FIREWALL WIZARD (Pop-up)
+- protects from security vulnerabilities
+- Yes, configure, select ‘CONTINUE’ and ‘NEXT’
+- Should the client be trusted, ‘YES’
+- should your current network be trusted, ‘YES’
+- Not going to fully setup the firewall in this part… 
+- enable the responsive firewall, ‘YES’ (use only if exposed to the internet in a WAN situation)
+- Responsive firewall is needed if soft phones are used via WAN
+- automatically configure Asterisk IP settings, ‘YES’
+- done with the firewall wizard
+
+SIP STATION FREE TRIAL (Pop-up)
+- skip, ’NOT NOW’
+
+DASHBOARD
+- click on the ‘APPLY CONFIG’ in upper right
+- you can stack changes and then click apply any time
+
+INITIAL SETUP STEPS
+- Firewall, NAT, SIP, Intrusion Detection, and Static IP
+- STATIC IP: ADMIN —> SYSTEM ADMIN —> NETWORK SETTINGS (set IP and check gateway)
+- DEFAULT NAME:  SETTINGS —> ADVANCED SETTINGS —> (on bottom) SYSTEM IDENTITY
+- NAT:  SETTINGS —> ASTERISK SIP SETTINGS (determines which IP address packets are sent out as)
+- NAT:  verify WAN, and add local networks if needed and CRM systems or VPN —> click ‘SUBMIT’
+- NAT:  see tabs:  General SIP, Chan SIP, Chan PJSIP
+- NAT:  (Complicated to change ports)
+- NAT:  (Default ‘main’ SIP port of 5060 is assigned to PJSIP by default… want to change it)
+- NAT:  (We want to change the CHAN_SIP to the ‘main’ SIP port of 5060)
+- NAT:  CHAN SIP TAB —> (scroll to bottom) BIND PORT (default 5160) —> change to 5260
+- NAT:  (changing that to 5260 will allow us to change it to 5060 after changing PJSIP to 5160)
+- NAT:  CHAN PJSIP TAB —> PORT TO LISTEN ON —> change to 5160 (click submit and OK)
+- NAT:  CHAN SIP TAB —> (scroll to bottom) BIND PORT (now shows 5260) —> change to 5060 (click submit and OK)
+- NAT:  click ‘APPLY CONFIG’
+- NAT:  COMPLETE
+- IDS:  ADMIN —> SYSTEM ADMIN —> INTRUSION DETECTION
+- IDS:  (blocks out intruders through attempts blocks, and whitelists good networks)
+- IDS:  (BAN TIME of 1800 - half hour, MAX RETRY of 8, FIND TIME of 600 - 10 mins)
+- IDS:  (if a device tries to login 8 times within 10 minutes, block the device for a half hour)
+- IDS:  BAN TIME —> 3600, MAX RETRY —> 3, FIND TIME —> 300, WHITELIST —> trusted networks
+- IDS:  SUBMIT, then you are COMPLETE with IDS
+- FIREWALL:  CONNECTIVITY —> FIREWALL
+- FIREWALL:  INTERFACES TAB —> ETH0 (is set to trusted, but we want to change to scrutinize the traffic)
+- FIREWALL:  NETWORKS TAB —> (we want to whitelist the trusted networks, and the initial wizard results shows here)
+- FIREWALL:  (it was redundant to have the host, and the subnet whitelisted, so delete the host)
+- FIREWALL:  (now add in the additional networks to be trusted, if any) add networks, drop down to TRUSTED
+- FIREWALL:  (don’t forget about the VPN, set it to trusted)
+- FIREWALL:  (can whitelist WANs, and SIP providers) use the description fields so that you know what to delete later!
+- FIREWALL:  INTERFACES TAB —> (eth2 is listed as trusted, use dropdown to select) select ‘Internet Default Firewall’
+- FIREWALL:  (this action closed the gates, except for the LANs and Subnets that we specifically white listed)
+- FIREWALL:  (Make sure these settings are correct before clicking APPLY… can lock yourself out of the PBX!)
+- FIREWALL:  click UPDATE INTERFACES
+- FIREWALL:  TROUBLESHOOT - reboot twice within 5 minutes to shut down the firewall for 5 mins to make correct changes.
+- FIREWALL:  **TROUBLESHOOT NOTE** - the initial configuration may freeze up the network, just reboot via the terminal
+- FIREWALL:  RESPONSIVE FIREWALL:  optional, disabled by default (this is a last ditch effort, VPN is used first)
+- FIREWALL:  SERVICES:  all services are enabled by default though the internet zone… can change things to be allowed from WAN
+- FIREWALL:  COMPLETE
+
+EXTENSIONS
+- Considerations for phone deployments
+    — the extension digits (recommend 3 to 5 digits)
+    — they should not overlap with existing dial plans or feature codes
+    — don’t use 1xxx because it doesn’t know if you’re dialing x1234, or 1-234-xxx-xxxx (bad)
+    — the 1 will automatically implement a pause for the United States
+    — for multiple locations, the scheme should use a pattern (21xx, 22xx, 23xx)
+- NOTE:  there are three different ways to add extensions - Bulk, Manual, and QUICK
+- BULK:  ADMIN —> BULK HANDLER —> IMPORT TAB (used with a CSV file that is pre setup)
+- MANUAL:  APPLICATIONS —> EXTENSIONS —> ADD EXTENSION —> +ADD NEW CHAN SIP EXTENSION
+- MANUAL:  Brings us to the extension details page
+- MANUAL:  (it’s easier to just use the QUICK add, then go back to edit manually
+- QUICK:  APPLICATIONS —> EXTENSIONS —> +QUICK CREATE EXTENSION (use the pop-up)
+- QUICK:  do it all, and adjust the details afterwards as necessary
+- QUICK:  TYPE —> Chan_SIP
+- QUICK1:  EXTENSION NUMBER —> (enter your value) - 2000
+- QUICK1:  DISPLAY NAME —> (enter value) - Tony Stark
+- QUICK1:  OUTBOUND CALLER ID —> leave blank
+- QUICK1:  EMAIL ADDRESS —> (enter value) - info@emailaddress.com
+- QUICK2:  ENABLE FIND ME / FOLLOW ME —> default NO
+- QUICK2:  CREATE USER MANAGER USER —> default YES (extensions and users are different)
+- NOTE:  users may have multiple extensions, and may have access to other voicemail boxes
+- NOTE:  the user can log into a control panel to manage their individual items and extensions
+- QUICK2:  USER MANAGER GROUPS —> default ‘All Users’
+- QUICK2:  ENABLE VOICEMAIL —> default YES
+- QUICK2:  VOICEMAIL PIN —> default is ‘extension number’ - change to 12345
+- QUICK2:  Click FINISH
+- EDIT QUICK:  click the Pencil Icon in the ALL EXTENSIONS TAB
+- EDIT EXTENSION:  Tabs are GENERAL, VOICEMAIL, FIND ME/FOLLOW ME, ADVANCED, PIN SETS, OTHER
+- NOTE:  Only the most common settings are covered in this document, hover over a blue question mark for more info
+- EDIT GENERAL:  Outbound CID —> this could be set to something different than the user name (recommended)
+- EDIT GENERAL:  Secret… leave this alone, and the Endpoint Manager will use it automatically with Sangoma phones
+- EDIT GENERAL:  Language - can add language packs if needed for the user
+- EDIT GENERAL:  User Directory Settings - by default, this is the directory that the user is in - set to ‘PBX Internal Directory
+- EDIT GENERAL:  Username - can use this to create a unique user name for login
+- EDIT GENERAL:  Password - let the user change the password, because once past the screen, the admin can’t change it
+- EDIT GENERAL:  Group - by default set to ‘All Users’
+- EDIT VOICEMAIL:  Require from Same Extension —> default NO (yes will prompt for password every time)
+- NOTE:  *97 = Enter THIS extension’s voicemail box
+- NOTE:  *98 = Enter a different extension’s voicemail box
+- EDIT VOICEMAIL:  Email Address —> will send a message saying that there is a new voicemail
+- EDIT VOICEMAIL:  Pager Email Address —> delete, because no one uses pagers anymore
+- EDIT VOICEMAIL:  Email Attachment —> YES
+- EDIT VOICEMAIL:  Delete Voicemail —> if it’s enabled, it will delete the voicemail after sending, set to NO
+- EDIT FIND ME / FOLLOW ME:  Rings desk phones for a few seconds, and then moves on to a new extension or cell phone
+- NOTE:  there is a specific video to Find Me / Follow Me so it’s not covered here
+- EDIT ADVANCED:  Recording options
+- NOTE:  *1 turns on the on-demand recording during a phone call
+- EDIT ADVANCED:  RECORDING OPTIONS: Inbound Internal Calls —> change to NEVER (don’t want executive’s calls recorded)
+- EDIT ADVANCED:  RECORDING OPTIONS: Outbound Internal Calls —> change to NEVER
+- EDIT PIN SETS:  Allow users access to specific pin codes for dialing outbound --> keep as default
+- EDIT OTHER:  iSymphony - a web based console for calls in progress (other options like flash operator panel are better)
+- NOTE:  may uninstall iSymphony
+- EDIT:  click SUBMIT, and APPLY - COMPLETE
+
+ENDPOINT MANAGER
+- Is a way to create templates that you can apply to groups of phones to assign settings for a device for a particular extension
+- remotely provision the configuration of your phones so that everything works really well with FreePBX
+- it has to do with all the buttons and settings that are available on the phones… this does all of the heavy lifting for us!
+- EM:  SETTINGS —> ENDPOINT MANAGER
+- NOTE:  use the hamburger menu on the right to access the sub menus in Endpoint Manager (EM)
+- EM GLOBAL:  Is what IP address are we connecting to like the LAN address of FreePBX, also could be a SIP proxy
+- EM GLOBAL:  Internal Address —> LAN IP Address
+- NOTE:  may need to add “TFTP Server - <PBX IP>” to the assigned DHCP address
+- EM GLOBAL:  External Address —> (to provision outside of the WAN) enter WAN or FQDN… recommend using VPN instead!!
+- EM GLOBAL:  Phone Admin Password —> default is 222222, 
+- NOTE:  Sangoma phone default user/pass is admin:admin
+- EM FM:  access the Firmware Management (FM) through the hamburger menu
+- EM FM:  You can use two Firmware slots to have multiple firmware versions available
+- EM FM:  may use one of the slots for testing a phone if needed.  This will download the firmware in the background
+- EM TEMPLATES:  This is under ‘Brands’ from the hamburger
+- EM TEMPLATES:  click on Samgoma to see that there’s a default template that’s not in use.
+- EM TEMPLATES:  click on the Sangoma_Default template.  
+- NOTE:  Make copies always before changing a template
+- EM TEMPLATES:  templates can be created for all sorts of different reasons.
+- EM TEMPLATES:  DUPLICATE:  click on template —> TASKS TAB —> DUPLICATE
+- EM TEMPLATES:  BRANDS now shows two templates after duplication
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: Default Internal Template, default NO, change to —> YES
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: Default External Template, default NO, set to —> NO
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: SIP Destination Address —> Internal
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: Provisional Protocol —> HTTP (verify PBX LAN address)
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: Provisioning Address —> Internal
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: Force Firmware Version —> Firmware Slot 1 (verify PBX LAN address)
+- EM TEMPLATES:  Sangoma_s500:  GENERAL TAB: 3 options for SAVE… use —> ‘Save and Update Phones’
+- NOTE:  Only hit save if you haven’t hooked up any phones yet
+- EM TEMPLATES:  Sangoma_s500:  MODELS TAB: click on the S500 button under ‘Available Phones’
+- EM TEMPLATES:  Sangoma_s500:  MODELS TAB: (Pop-up) this is where you can set up buttons on the phones
+- NOTE:  Line keys are the hard point keys next to the screen… can have up to 35 different functions on multiple pages
+- NOTE:  the first page should be for that phone’s function, then the other pages are for Busy Lamp Field (BLF) keys within the organization
+- NOTE:  BLF is a way to see if other people in the organization are on the phone or off the phone
+- EM TEMPLATES:  Sangoma_s500:  REGIONAL TAB: Time zones and formats are here
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Used A LOT!  Great for Sangoma phones
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Background Image can be the company’s logo
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Voicemail Tone —> Disable (gives a beep when there’s a voicemail)
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Ring Tone —> Ring 2 for internal, Ring 1 for external (sound of ring)
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Keypress Tone —> Enable
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Hold Tone —> Enable for receptionist only, use Hold Tone Delay of 30
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Blacklight Timeout —> dim the screen
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Contact Photos —> upload a pic of users (User Manager)
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Dial Entry Timeout —> default is 0, no expiration on the dial entry (double edge sword) —> 3
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: BLF Long Press Idle State —> default is blank —> *80 (intercom)
+- NOTE:  a BLF is a speed dial, but long press will append *80 to the extension number which is an intercom
+- EM TEMPLATES:  Sangoma_s500:  OPTIONS TAB: Voicemail Key Type —> Voicemail Application (uses the phone’s voicemail app, it’s nice!)
+- EM TEMPLATES:  Sangoma_s500:  REDUNDANCY TAB: If the phone is unable to register to the PBX for some reason, this is an alternative connection
+- EM TEMPLATES:  Sangoma_s500:  VLAN TAB: set up the ports on the back of the phone
+- EM TEMPLATES:  Sangoma_s500:  LDAP TAB: not used
+- EM TEMPLATES:  Sangoma_s500:  TASKS TAB: already talked about to duplicate a template
+- EM TEMPLATES:  Sangoma_s500:  hit Save and Apply (drop down menu)
+- NOTE:  You can go to portal.sangoma.com to see all of your connected phones.
+- NOTE:  may want to purchase a bar code scanner for entering a massive amount of phones
+- SANGOMA PORTAL:  on left, go to ‘Sangoma Phones’ and then ‘List’
+- SANGOMA PORTAL:  add phone, then edit its properties
+- SANGOMA PORTAL:  ZERO TOUCH CONFIGURATION:  check box —> yes, Enable Redirection
+- SANGOMA PORTAL:  ZERO TOUCH CONFIGURATION:  Redirection Type —> IP/FQDN
+- SANGOMA PORTAL:  ZERO TOUCH CONFIGURATION:  IP/FQDN Protocol —> http://
+- SANGOMA PORTAL:  ZERO TOUCH CONFIGURATION:  IP/FQDN Address —> 192.168.254.30:84 (port 84) —> change to PBX LAN IP
+- NOTE:  Now factory reset the phone in question
+- NOTE:  The phone will now go out to the Sangoma portal to get it’s assignment
+- EM:  SETTINGS → EM → EXTENSION MAPPING (hamburger menu)
+- EM EXTENSION MAPPING:  use the Add Extension Button to do this manually… OR…
+- EM EXTENSION MAPPING:  if using a Sangoma s400 or greater, it will talk to the server and use the default template for login.
+- NOTE:  will need the extension number and voicemail password to provision the phone
+- EM EXTENSION MAPPING:  the phone should show up now in the extension mapping tab
+- EM EXTENSION MAPPING:  adding a phone lower than s400 —> Add Extension Button —> use the drop downs (Sangoma_Default template)
+- EM EXTENSION MAPPING:  select ‘Save and Rebuild Configs’
+- NOTE:  now, the configuration file will exist for that MAC address after adding it to the portal.sangoma.com
+- PHONE:  now plug in the phone to a PoE interface on the appropriate LAN and it will configure and connect automatically
+- NOTE:  use *43 for an echo test to see if the phone is talking to the PBX
+- REPORTS —> ASTERISK INFO —> PEERS:  shows information to verify that your phone was added, look for STATUS OK
+
+(OPTIONAL) MANUALLY SETTING UP PHONES
+- each phone will be different… find the manual, log into the phone, and add the settings
+
+SOFTPHONES
+- Install Zophos on the computer and add an extension
+
+ATA’s
+- Analog Telephony Adapter (ATA)
+- these are the analog phones
+- Foreign eXchange Station (FXS) - used for analog phones, fax machines (not recommended), and misc devices
+- Foreign eXchange Office (FXO) - used for copper POTS lines
+- Recommend the Cisco SPA112 - 2 port FXS ATA
+
+UPDATES
+- Two types of updates… system for the OS, and the FreePBX updates for the software
+- ADMIN —> UPDATES
+- AUTO UPDATE:  can use the scheduler and alerts tab… not recommended.  Just do it in a controlled environment after hours.
+- MODULE UPDATES: these are the FreePBX updates.  BUTTON —> CHECK ONLINE
+- MODULE UPDATES:  if you see errors for dependencies, you need to update the dependencies first, then move on (ssh will do this automatically)
+- SYSTEM UPDATES:  these are the OS updates.  BUTTON —> CHECK ONLINE —> UPDATE SYSTEM.  (ssh is recommended for this as well)
+- SYSTEM:   $ sudo yum update -y (this is for system updates)
+- MODULE:  $ fwconsole ma upgradeall (this is the command for upgrading modules)
+- DASHBOARD:  click the APPLY CONFIG button
+
+PBX TRUNKING (Informational for learning)
+- NOTE:  Use the ClearlyIP Trunking Module to add your trunks!! (link is below)
+- Three types of common trunking:  POTS, PRI, SIP
+- POTS:  Plain Old Telephony System (POTS) - old school coper lines that you would have in your home
+- POTS:  done via an analog gateway (like the Sangoma Vega.  Can also be done with a PCI card (FXO card) in the server
+- POTS:  very expensive, and not very flexible.  Must pay for extras like Caller ID
+- POTS:  can purchase a HUNT GROUP (rollover group) which will be multiple lines.  If one line is taken, it will roll over to the next
+- POTS HUNT GROUP:  bad because you can’t make a caller ID see only one number based on the line that’s available
+- POTS HUNT GROUP:  can set up a voice mail at the carrier for the final roll over… not recommended because it’s not on the PBX
+- PRI:  Primary Rate Interface (PRI) is a T1/E1 with 23 voice channels plus 1 D-channel (data channel)
+- PRI:  T1 is the older technology with 23 channels and doesn’t have Caller ID.  E1 is 31 voice, and 2 D.
+- PRI:  Vega 200G - need a gateway to convert the signal.  There are PRI cards as well that can go into the server.
+- PRI:  it’s usually a VoIP running SIP until it hits your building, and is then turned into an E1 line.  Around $400 (doesn’t count usage)
+- SIP:  Session Initiation Protocol (SIP) is the most common VoIP protocol.  Skinny Protocol for Cisco, IAX for multiple Astrisk systems are some others.
+- SIP PROVIDERS:  There are several types of SIP providers:  Pay-as-you-go, MRC (like a home phone w/monthly fee), and Enterprise.
+- SIP ENTERPRISE:  gives a dedicated circuit and has on site equipment.  Most expensive, but most reliable
+- SIP PROVIDER:  CREDENTIAL AUTH:  gives credentials (user / pass), then registers outbound through the firewall (stateful connection)
+- SIP PROVIDER:  sometimes the firewall can be problematic by breaking connections
+- SIP PROVIDER:  IP BASED AUTHENTICATION:  no need for user / pass.  Sends outbound to provider IP address.  Incoming goes to WAN.
+- SIP PROVIDER:  IP BASED AUTHENTICATION:  have to open ports 5060 UDP, and 10000-20000 UDP.  Need to LOCK DOWN the firewall
+- SIP PROVIDER:  IP BASED AUTHENTICATION:  make sure the firewall rules only allow port connections from the Provider’s IP address
+- SIP HANDOFF:  also known as SIP peering.  It doesn’t use general internet connection
+- SIP HANDOFF:  for outbound, the PBX will be peering through on-site equipment that has a dedicated circuit, separate from internet circuit.
+
+CLEARLYIP MODULE:
+- NOTE: This is used to automatically create inbound and outbound routes… no need to perform manual installation
+- WEBSITE WITH INSTRUCTIONS:  https://kb.clearlyip.com/trunking/FreePBX-PBXact-Automated-Setup-with-Module.html
+
+OUTBOUND ROUTES (use the ClearlyIP Module instead of this)
+- NOTE:  Use the link above for the ClearlyIP Module instead of the below instructions to manually add a trunk
+- NOTE:  This was used to configuration with ClearlyIP:  https://kb.clearlyip.com/trunking/FreePBX-PBXact-Manual-Setup.html
+- Crosstalk Solutions uses Vitelity SIP Trunking
+- Documentation is usually lacking from the providers on how to set up SIP
+- PRI:  CONNECTIVITY —> DAHDI CONFIG
+- PRI:  the cards in the server should show up there
+- PRI:  GLOBAL SETTINGS —> SAVE.  Then you’ll have to restart the services
+- SIP:  User / Pass can be set up through sub accounts for multiple numbers and locations
+- SIP:  CONNECTIVITY —> TRUNKS —> +ADD SIP (chan_sip) TRUNK
+- SIP:  ADD TRUNK:  GENERAL:  Trunk Name:  name it something with INBOUND (clearlyip-inbound)
+- SIP:  ADD TRUNK:  GENERAL:  Outbound Caller ID:  use the phone number on your account
+- SIP:  ADD TRUNK:  GENERAL:  leave the rest at default
+- SIP:  ADD TRUNK:  DIAL NUMBER MANIPULATION:  leave as default
+- SIP:  ADD TRUNK:  SIP SETTINGS:  OUTGOING:  name the trunk (clearlyip-outbound), then copy/paste the peer details from the provider (replace values)
+- SIP:  ADD TRUNK:  SIP SETTINGS:  INCOMING:  delete USER Context and Details, and type in a Register String
+- NOTE:  REGISTER STRING:  <subname>:<password>@<peer_details>:<port_5060>
+- SIP:  ADD TRUNK:  now click Submit, and Apply
+- SIP:  CONNECTIVITY —> TRUNKS —> +ADD SIP (chan_sip) TRUNK
+- SIP:  ADD TRUNK:  GENERAL:  Trunk Name:  name it something with OUTBOUND (clearlyip-outbound)
+- SIP:  ADD TRUNK:  GENERAL:  Outbound Caller ID:  use the phone number on your account (can also set to whatever)
+- SIP:  ADD TRUNK:  GENERAL:  Maximum Channels:  10 (can put whatever you’d like)
+- SIP:  ADD TRUNK:  DIAL NUMBER MANIPULATION:  leave as default
+- SIP:  ADD TRUNK:  SIP SETTINGS:  OUTGOING:  name it something with OUTBOUND (clearlyip-outbound)
+- SIP:  ADD TRUNK:  SIP SETTINGS:  OUTGOING:  Peer Details:  copy/paste from provider
+- SIP:  ADD TRUNK:  SIP SETTINGS:  INCOMING:  can delete everything out
+- SIP:  ADD TRUNK:  SIP SETTINGS:  click Submit and Apply	
+- NOTE:  We’ve created the TRUNK, but now we need to tell the system to use it
+- REPORTS —> ASTERISK INFO —> REGISTRIES —> look at CHAN_SIP_REGISTRY (to check if the trunk is working)
+- NOTE:  now we need to create our outbound root
+- CONNECTIVITY —> OUTBOUND ROUTES  —> +ADD OUTBOUND ROUTE (you can have several routes, but this one will be simple)
+- OUTBOUND ROUTE:  EMERGENCY:  name the route with EMERGENCY (it’s important to make sure that this is correct)
+- OUTBOUND ROUTE:  EMERGENCY:  Route CID:  use your phone number as the caller ID
+- OUTBOUND ROUTE:  EMERGENCY:  Route Type:  set as an Emergency Route
+- OUTBOUND ROUTE:  EMERGENCY:  Trunk Sequence for Matched Routes:  select the ‘outbound’ route that you created
+- OUTBOUND ROUTE:  EMERGENCY:  DIAL PATTERNS:  use the wizard, uncheck the 7 and 10 digit patterns, leave US EMERGENCY
+- OUTBOUND ROUTE:  EMERGENCY:  DIAL PATTERNS:  click on Generate Routes
+- OUTBOUND ROUTE:  EMERGENCY:  DIAL PATTERNS:  you can delete the 933 one (it is a test)
+- NOTE:  Match Pattern (send it out and match it), Prefix (for digits you are stripping off of the dial stream), Prepend (add to a number)
+- OUTBOUND ROUTE:  EMERGENCY:  ADDITIONAL SETTINGS:  Call Recording click on FORCE
+- OUTBOUND ROUTE:  EMERGENCY:  click on Submit and Apply
+- OUTBOUND ROUTE:  DEFAULT:  BUTTON —> +ADD_OUTBOUND_ROUTE
+- OUTBOUND ROUTE:  DEFAULT:  name it DEFAULT, this will be used if the dial pattern doesn’t match anything else
+- OUTBOUND ROUTE:  DEFAULT:  CID will be the phone number
+- OUTBOUND ROUTE:  DEFAULT:  Trunk Sequence for Matched Route:  use the OUTBOUND route you created before
+- OUTBOUND ROUTE:  DEFAULT:  DIAL PATTERNS:  uncheck Emergency, and add the 11 Digit Patterns, and Long Distance —> click Generate
+- NOTE:  For the patterns, the ’N’ is any number 1-9, and the ‘x’ is any number 0-9 (can’t start dialing a number with a zero, so it shows Nxxxxxx)
+- NOTE:  it generates the 7, 10, and 11 digit dial patterns… NXXXXXX, NXXNXXXXXXX, 1NXXNXXXXXX (two of the last one)
+- OUTBOUND ROUTE:  DEFAULT:  Prepend 7 digit dialing:  1702 (need to prepend with the 1 and area code if someone is dialing locally)
+- OUTBOUND ROUTE:  DEFAULT:  Prepend 10 digit dialing:  1 (most providers will accept a 10 digit, but it’s better to just give them an 11 digit)
+- OUTBOUND ROUTE:  DEFAULT:  Prepend the last 11 digit dialing:  add a ‘+’ (this isn’t needed, but will cover various situations, mostly because of redial)
+- NOTE:  you can do the dial pattern wizzard another time now and create patterns for US INFORMATION (411, 511, etc…)
+- NOTE:  you can use the prefix to kill any ‘976’ or paid calls… type 1976XXXXXXX in prefix, and put in 0 for the prepend
+- OUTBOUND ROUTE:  DEFAULT:  IMPORT/EXPORT PATTERNS:  use this to export to a .csv if you want
+- OUTBOUND ROUTE:  DEFAULT:  ADDITIONAL SETTINGS:  Call Recording can be set to YES
+- NOTE:  commercial modules may add other options to the ADDITIONAL SETTINGS
+- NOTE:  You can add an outbound route for international calls… the dot ‘.’ that it adds means any numbers after the initial (011.)
+- OUTBOUND ROUTE:  now you can sort the priority of matching, and hit Apply
+
+INBOUND ROUTES
+- this is saying that someone dialed my phone number… but what do I do with it?
+- CONNECTIVITY → INBOUND ROUTES → +ADD INCOMING ROUTE
+- IR:  GENERAL:  Description, create a Default (catch-all) route
+- IR:  GENERAL:  Alert Info, this is a good way to set up a custom ring… leave default for now
+- IR:  GENERAL:  Set Destination (there are a ton of options) → Extensions → choose your extension
+- IR:  PRIVACY:  PM will intercept a call that comes from malicious or unknown caller ID phone calls
+- IR:  OTHER:  Call Recording, set to YES
+- IR:  OTHER:  CID Lookup, leave at default, but may want to look into it later
+
+
+
+
+
+RESOURCES:
+https://kb.clearlyip.com/trunking/FreePBX-PBXact-Automated-Setup-with-Module.html
+https://kb.clearlyip.com/trunking/FreePBX-PBXact-Manual-Setup.html
+
+NOTES:
+EDIT TRUNK:
+
+ADD CHAN-SIP TRUNK
+NOTE:  this is for the INBOUND TRUNK
+GENERAL: Trunk Name = ClearlyIP-Inbound
+GENERAL:  Outbound CallerID = phone number from ClearlyIP Portal
+SIP SETTINGS:  OUTOING:  Trunk Name = ClearlyIP-inbound <can be whatever>
+SIP SETTINGS:  OUTGOING:  PEER Details = <fields provided by ClearlyIP>
+
+OUTGOING:  PEER Details Default:
+host=1.us-central.clearlyip.com
+username=43ef683aec
+secret=f53dbeaa277f0163
+type=peer
+
+OUTGOING:  PEER Details per Crosstalk Solutions: (this is for vitelity, not ClearlyIP)
+type=friend
+dtmfmode=auto
+username=[sub account name]
+secret=[password set on sub account]
+context=from-trunk
+insecure-port.invite
+canreinvite=no
+host=inbound 17.vitelity.net
+
+INCOMING:  (delete everything in these fields)
+INCOMING:  Register String:  username:password@inbound17.vitelity.net:5060
+
+Click Submit, Apply
+
+ADD CHAN-SIP TRUNK
+NOTE:  this is for the INBOUND TRUNK
+GENERAL:  Trunk Name = ClearlyIP-Outbound
+GENERAL:  Outbound CallerID = phone number from ClearlyIP Portal
+GENERAL:  Maximum Channels:  10
+SIP SETTINGS:  OUTGOING: Trunk Name = ClearlyIP-outbound
+SIP SETTINGS:  OUTGOING:  PEER Details
+
+OUTGOING:  PEER Details per Crosstalk Solutions: (this is for vitelity, not ClearlyIP)
+type=friend
+dtmfmode=auto
+username=[sub account name]
+secret=[password set on sub account]
+fromuser=[sub account name]
+trustrpid=yes
+sendrpid=yes
+context=from-trunk
+canreinvite=no
+host=inbound17.vitelity.net
+
+INCOMING:  (delete everything in these fields)
+
+
+
+TROUBLESHOOTING:
+20201117:  There was an issue with the Sangoma Appliance 60 where it would not reach out to the internet.  Through the network settings, I made Opt1 a static IP of .50, and made Opt2 DHCP.  After that, I was unable to ping google or get updates online for the system.  I have since change Opt1 back to DHCP.  My suspicion is that the system isn’t picking up a DNS server, and there is no where to put it into the FreePBX system that I know of (right now).  UPDATE: once I changed the Opt1 back to DHCP, I was able to ping google.
+
+20201118:  I was able to upgrade to FreePBX 15 (from 14) using the upgrade module.  Instructions are here.  After that upgrade, nothing worked.  After a ton of research, it turns out it was some sort of version control though a file.  The fix was found here.
+
+20200520: 
+noippaul@emailaddress.com
+emailaddresspaul.ddns.net
+standard password plus itself
+
+
+UDP 10000-20000 NAT RULE FOR PFSENSE
+
+
+TCP/UDP 5060-2560 NAT RULE FOR PFSENSE
+
+
+Custom Configurations
+
+Ring Groups - Do you want all phones to ring at the same time?
+
+Navigate > Applications > Ring Groups
+Group Description - Customize to you or the clients liking.
+Extension List - List all extensions that you want to ring at the same time.
+Ring Strategy - For General use, use RingAll
+Ring Time: About 5 seconds = 1 Ring
+Announcement - Default
+Play Music On Hold - Default
+CID NAME PREFIX  - Default
+Alert Info - Default
+Ringer Volume Override - Default
+Send Progress - Yes
+Mark Answered Elsewhere - Yes
+Ignore CF Settings - No
+Skip Busy Agent - No
+Enable Call Pickup - No
+Confirm Calls - No
+Remote Announce - Default
+TooLate - Announce - Default
+Change External CID Configuration - Use Dialed Number
+Fixed CID Value - Blank
+Call Recording - User Preference
+Destination if no answer - Voicemail / Ext - Busy Message (Make sure that someone makes this message by signing into their voicemail and making the recording.
+
+Make sure that you set the “Inbound Routes to connect to this “Ring Group” > Connectivity > Inbound Routes (Either create new or edit existing)
+
+*** Clearly IP App *** - Must login to queue from app *45(queue number) example *451500
+
+
+pFsense configuration:
+
+Perform the initial basic setup for pFsense.
+
+Step 1 - Forwarding of Ports
+
+Navigate to Firewall > NAT
+
+
+Click Add (If nothing is mentioned, leave as default)
+
+Interface > WAN
+Address Family > IPv4
+Protocol > TCP/UDP
+Destination > WAN Address
+Destination Port Range > From Port > SIP > To Port > SIP
+Redirect Target IP > Single Host > (PBX IP Address)
+Redirect Target Port > SIP
+NAT Reflection > Use System Default
+Filter Rule Association > Rule NAT
+
+Click Save
+
+This should automatically create an entry under > Firewall > Rules (no need to edit that)
+
+Secondary Port > Click > Add with down arrow
+
+Interface > WAN
+Address Family > IPv4
+Protocol > TCP/UDP
+Destination > WAN Address
+Destination Port Range > From Port > OTHER > Custom: 10000 To Port > OTHER > Custom: 20000
+Redirect Target IP > Single Host > (PBX IP Address)
+Redirect Target Port > OTHER > Custom: 10000
+NAT Reflection > Use System Default
+Filter Rule Association > Rule NAT
+
+That is all you need to do for basic configuration, of course if you customize the FreePBX ports then, the above should match those customizations.
+pFsense SSL configuration: Enabling HTTPS for pfsense with a Self Signed Certificate
+https://alphaengineblog.wordpress.com/2018/11/24/enabling-https-for-your-pfsense-with-a-self-signed-certificate/
+Step 1: Create a backup and backdoor in case something goes wrong we can recover.
+
+Log into pfsense.
+
+Navigate to Diagnostics > Backup & Restore.
+
+Skip Packages = Unchecked
+
+Skip RRD = Checked
+
+Encryption = Checked
+
+Password = (create your preferred password and store it somewhere secure)
+
+Select the options and Download your configuration as XML.
+
+We will now enable ssh. 
+
+We enable ssh so if something goes wrong and we can no longer access our Web GUI, we can access the server through a UNIX terminal or from PuTTy on Windows. 
+
+Navigate to System > Advanced and scroll down until you find Secure Shell.
+
+Tick the box to enable SSH > and leave the SSH port on the Default setting of 22 or change as desired. You can log into your pfsense via SSH using your Administrator password. Optionally you can choose to create a Public Key. After we have finished with our SSL setup, you can choose to disable SSH again if you wish.
+
+
+
+Step 2: Creating a New Certificate Authority and Certificate for SSL.
+
+Navigate to System > Certificate Manager > CA’s and click on Add
+
+
+Default settings are fine here. You should give it a descriptive name so you know what it’s for. Fill out the location details according to your information.
+
+Creating a Sub (Intermediate) Certificate
+
+Next we need to create an Intermediate Certificate Authority.
+
+Go to System > Certificate Manager > CA’s and click on Add again.
+
+
+
+Enter your settings as in the screenshot. Again be descriptive in the name so you know what it’s for. Fill out the location details according to your information.
+
+Creating a New Certificate
+
+Now click on the Certificates Tab at System > Certificate Manager. Click on +Add/Sign to add a new certificate. Fill out everything as in the screenshot. Make sure to put your pfsense FQDN (Fully Qualified Domain Name) to your pfsense server. In the Descriptive Name and the Common Name fields.
+
+
+
+Certificate Attributes – The Certificate should be a Server Certificate. Make sure you put the IP Address of your pfsense firewall in the Alternative Names field along with the FQDN.
+
+
+
+Exporting the CA’s
+
+Navigate back to System/CA’s . This is important. Click on Export on both CA’s
+
+
+
+Step 3: Import into Firefox
+Open Firefox and head to Preferences > Privacy and Security > View Certificates.
+
+
+
+Click on the Import Button and navigate to your downloaded ROOT certificate. It will have a .crt extension. Be sure to check both checkboxes.
+
+
+
+Step 4: Enable SSL for pfsense
+
+Log back into your pfsense firewall > Navigate to System > Advanced > Admin Access. Make sure HTTPS is selected as your protocol, and change the SSL Certificate to the one you have created. Scroll down and click on Save. Now, once you restart your web browser you should see a Secure Connection to pfsense when accessing it next time.
+
+
+
+If it’s working successfully the little lock in your browser navigation bar will turn green. Selecting it will open a small window that confirms your current connection is secure.
+
+
+REFERENCE PICTURE → USER CONTROL PANEL (UCP)
+ALL DEFAULT OPTIONS
+
+
