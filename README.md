@@ -10,3 +10,4 @@
 6. [Ubuntu_Server_Creation.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Ubuntu_Server_Build/Ubuntu_Server_Creation.md) - Build Ubuntu 20.4 Servers
 7. [PBX_build.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/PBX/PBX_build.txt) - FreePBX Server Build
 8. [Syncthing_build.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/SyncThing/SyncThing_build.txt) - SyncThing build on TrueNAS
+9. [Wordpress_change_URL.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Ubuntu_Web_Server_Scripts/Wordpress_change_URL.md) - Change URL for Wordpress in MariaDB
