@@ -14,33 +14,35 @@ navigate to where you would like to download Composer
 <br>
 If you don't have that directory, just create it.
 <br>
-Type: Composer % curl -s http://getcomposer.org/installer | php
+Type: curl -s http://getcomposer.org/installer | php
 <br>
-<pre>
-Composer % curl -s http://getcomposer.org/installer | php
+
+```
+curl -s http://getcomposer.org/installer | php
 All settings correct for using Composer
 Downloading...
 
 Composer (version 2.1.12) successfully installed to: /Users/development/Composer/composer.phar
 Use it: php composer.phar
-</pre>
+```
 
 ### GIVE CLI ACCESS TO COMPOSER
 By default, Macs don't have a /usr/local/bin folder available...
 ...so just make one
-<pre>
-bin % cd /usr/local
-local % sudo mkdir bin
-</pre>
+```
+cd /usr/local
+sudo mkdir bin
+```
 <br>
 Now navigate to where you downloaded composer...
 <br>
 and copy composer to /usr/local/bin/composer
 <br>
-<pre>
+
+```
 % cd ~/Downloads/Composer
 Composer % sudo cp composer.phar /usr/local/bin/composer
-</pre>
+```
 
 ### CHECK COMPOSER - did it install correctly?
 shows the man page for Composer
@@ -68,7 +70,7 @@ Now type: composer create-project --prefer-dist yiisoft/yii2-app-advanced yiip2
 <br>
 ...where yiip2 can be changed to any name for your project.
 
-<pre>
+```
 Sites % composer create-project --prefer-dist yiisoft/yii2-app-advanced yiip2
 Creating a "yiisoft/yii2-app-advanced" project at "./yiip2"
 Installing yiisoft/yii2-app-advanced (2.0.43)
@@ -77,7 +79,7 @@ Created project in /Users/development/Sites/yiip2
 Loading composer repositories with package information
 Updating dependencies
 Lock file operations: 85 installs, 0 updates, 0 removals
-</pre>
+```
 
 ### PHP INIT - start your website
 In a terminal window
@@ -91,7 +93,7 @@ Enter into your application directory and:
 type 'php init'
 <br>
 
-<pre>
+```
 yiip2 % php init
 Yii Application Initialization Tool v1.0
 
@@ -103,7 +105,7 @@ Which environment do you want the application to be initialized in?
   Your choice [0-1, or "q" to quit] 0
 
   Initialize the application under 'Development' environment? [yes|no] yes
-</pre>
+```
 
 ### CREATE A DATABASE
 this can be done with phpMyAdmin through MAMP
@@ -121,18 +123,18 @@ create database yiip4;
 Then do the same to grant privileges.
 <br>
 
-<pre>
+```
 GRANT ALL ON yiip4.* TO 'username'@'localhost' IDENTIFIED BY 'password’;
 FLUSH PRIVILEGES;
-</pre>
+```
 
 <br>
 If you're in CLI, you may need an exit statement to leave MySQL.
 <br>
 
-<pre>
+```
 EXIT;
-</pre>
+```
 
 ### DATABASE CONFIG - main-local.php (database config)
 Mac needs a socket for MySQL... 
@@ -146,7 +148,7 @@ For me, the {app directory} is the one described above
 "/Users/development/Sites/"
 <br>
 
-<pre>
+```
 'db' => [
             'class' => 'yii\db\Connection',
             // changed from localhost to 127.0.0.1
@@ -155,7 +157,7 @@ For me, the {app directory} is the one described above
             'password' => 'adminadmin',
             'charset' => 'utf8',
         ],
-</pre>
+```
 
 ### EXAMPLE MIGRATE ERROR 1 - MySQL Connection Refused
 In a terminal window
@@ -173,7 +175,7 @@ If the configuration is incorrect from the previous step, an error will show
 This is from an invalid Port entry listed above
 <br>
 
-<pre>
+```
 yiip2 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
 
@@ -188,7 +190,7 @@ Array
     [1] => 2002
     [2] => Connection refused
 )
-</pre>
+```
 
 
 
@@ -198,7 +200,7 @@ In a terminal window
 This error will show if you haven't included the socket information above:
 <br>
 
-<pre>
+```
 yiip2 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
 
@@ -213,14 +215,14 @@ Array
     [1] => 2002
     [2] => No such file or directory
 )
-</pre>
+```
 
 
 ### EXAMPLE MIGRATE ERROR 3 - MySQL access denied with password
 In a terminal window
 <br>
 
-<pre>
+```
 yiip2 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
 
@@ -235,11 +237,11 @@ Array
     [1] => 1045
     [2] => Access denied for user 'admin'@'localhost' (using password: YES)
 )
-</pre>
+```
 
 ### MIGRATION SUCCESSFUL - if there were no errors like the ones above
 
-<pre>
+```
 yiip4 % ./yii migrate
 Yii Migration Tool (based on Yii v2.0.43)
 
@@ -261,7 +263,8 @@ Apply the above migrations? (yes|no) [no]:yes
 2 migrations were applied.
 
 Migrated up successfully.
-</pre>
+```
+
 <br>
 If the migration was successful...
 <br>
