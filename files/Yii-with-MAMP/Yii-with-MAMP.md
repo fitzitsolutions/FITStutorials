@@ -132,9 +132,12 @@ create database yiip2;
 <br>
 Then do the same to grant privileges.
 <br>
+To do a two-step user creation and privilege grant, use this:
+<br>
 
 ```
-GRANT ALL ON yiip2.* TO 'username'@'localhost' IDENTIFIED BY 'password’;
+CREATE USER 'user'@'%' IDENTIFIED WITH mysql_native_password BY 'password';
+GRANT ALL ON database.* TO 'user'@'%';
 FLUSH PRIVILEGES;
 ```
 
