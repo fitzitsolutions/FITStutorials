@@ -641,4 +641,4 @@ If it’s working successfully the little lock in your browser navigation bar wi
 REFERENCE PICTURE → USER CONTROL PANEL (UCP)
 ALL DEFAULT OPTIONS
 
-
+# ADD CLEARLYIP VPN HERE
