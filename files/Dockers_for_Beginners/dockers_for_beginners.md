@@ -10,7 +10,7 @@ Why explain things here?  These are a couple links if you need to know more:
 More links will be given throughout this learning experience...
 <hr>
 
-## QUICK COMMANDS
+## QUICK REFERENCE COMMANDS
 
 After creating a dockerfile, you can build it using this:
 ```
@@ -19,6 +19,18 @@ sudo docker build . -t name-of-build
 After the build, you can run it using this (ports explained in the links above):
 ```
 sudo docker run -p 8000:80 -d name-of-build:latest
+```
+Also some flags learned throughout this experience:
+```
+sudo docker run -p 8005:80 --hostname=ctfprac --name=apachetpz -d ctfpractice
+```
+And a simple stopping of the contanier using the name:
+```
+sudo docker stop apachetpz
+```
+To get a shell into the container:
+```
+sudo docker exec -it apachetpz /bin/bash
 ```
 
 <hr>
@@ -624,6 +636,160 @@ Deleted: sha256:b0527c827c82a8f8f37f706fcb86c420819bb7d707a8de7b664b9ca491c96838
 Deleted: sha256:75147f61f29796d6528486d8b1f9fb5d122709ea35620f8ffcea0e0ad2ab0cd0
 Deleted: sha256:2938c71ddf01643685879bf182b626f0a53b1356138ef73c40496182e84548aa
 Deleted: sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2
+```
+
+<br><br>
+
+<hr>
+
+# TIME TO REBUILD AND PLAY MORE
+Now that I've deleted all of the images, I will rebuild using my dockerfile thus downloading new images and creating a new ctfpractice image.<br>
+Before I begin, I want to make sure I have a clear goal in mind...<br>
+<br>
+
+### NEW GOAL FOR THIS IMAGE
+
+- build Ubuntu image
+- install appropriate packages
+- give container (or perhaps the image) a hostname
+- add the IP and hostname to the /etc/hosts on the container
+- run apache2 with a spash webpage
+<br><br>
+
+Starting with the dockerfile, I change a few things to get the installs done and set up an apache config file.<br>
+NOTE:  I'm keeping all of the old stuff in the file for reference.<br>
+
+```
+FROM ubuntu:latest
+
+# ENVIRONMENTALS
+ENV DEBIAN_FRONTEND=noninteractive
+
+# UPDATE AND UPGRADE
+RUN apt update && apt-get upgrade -y
+
+# INSTALL FOR IFCONFIG AND WEBSERVER
+RUN apt install -y --no-install-recommends \
+		net-tools \
+		apache2
+
+# INSTALL PHP
+RUN apt install -y --no-install-recommends \
+		php \
+		php-cli \
+		php-fpm \
+		php-json \
+		php-common \
+		php-mysql \
+		php-zip \
+		php-gd \
+		php-mbstring \
+		php-curl \
+		php-xml \
+		php-pear \
+		php-bcmath \
+		php-curl \
+		php-json \
+		php-cgi \
+		php-mysql
+
+# CLEAN UP ALL OF THE INSTALLATIONS
+RUN apt clean
+
+# WRITE APACHE CONFIGS
+RUN echo "ServerName Localhost" >> /etc/apache2/apache2.conf
+RUN apache2ctl configtest
+RUN a2dissite 000-default
+# RUN rm/etc/apache2/sites-available/000-default.conf
+
+# OPEN PORT 80
+EXPOSE 80
+
+# NO LOGER NEEDED, BUT KEPT FOR REFERENCE
+# VOLUME /tmp/wordlists
+# VOLUME /tmp/ctf
+
+CMD ifconfig | grep inet > /tmp/ip.txt
+CMD echo "Container IP Address: "
+CMD cat ip.txt
+# CMD hostnamectl set-hostname ctfpractice.the-petting-zoo.com
+
+# START APACHE
+CMD /usr/sbin/apache2ctl -D FOREGROUND
+```
+
+<br>
+
+### NOTE: the environment variable was to avoid human interaction during the build.
+With this build, it still tried to do a tzdata configuration as part of net-tools.<br>
+
+```
+Configuring tzdata
+------------------
+
+Please select the geographic area in which you live. Subsequent configuration
+questions will narrow this down by presenting a list of cities, representing
+the time zones in which they are located.
+
+  1. Africa      4. Australia  7. Atlantic  10. Pacific  13. Etc
+  2. America     5. Arctic     8. Europe    11. SystemV
+  3. Antarctica  6. Asia       9. Indian    12. US
+Geographic area: ^C
+```
+
+<br><br>
+
+And finally, we run the docker to see if it all worked...
+```
+sudo docker run -p 8005:80 --hostname=ctfprac --name=apachetpz -d ctfpractice
+7b52146ac96f6d4493969123ee6fd098d7c2aeffb5503397995b5b038b9d000b
+fitsadmin@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE         COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+7b52146ac96f   ctfpractice   "/bin/sh -c '/usr/sb…"   4 seconds ago   Up 4 seconds   0.0.0.0:8005->80/tcp, :::8005->80/tcp   apachetpz
+```
+
+<br><br>
+Awesome!  Now we have a build that worked, and is running apache2 with the hostname... <br>
+but all of the things didn't happen.  There's nothing in /tmp (supposed to be ip.txt) <br>
+This was because ipconfig wasn't avalable on the system... probably because of that environment variable <br>
+for my learning, I'll build it again an manually input the tzdata to confirm that net-tools gets installed <br>
+<br><br>
+
+Got a wierd error on that one:
+```
+Reading package lists...
+Building dependency tree...
+Reading state information...
+E: Unable to locate package  #--no-install-recommends
+The command '/bin/sh -c apt install -y \ #--no-install-recommends 		net-tools 		apache2' returned a non-zero code: 100
+```
+<br><br>
+
+So I changed a couple things... I got rid of the --no-install-recommend (that was supposed to make the build smaller)<br>
+and I added a different environment variable to automatically set tzdata:
+
+```
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+```
+
+<br>
+Now ifconfig works just fine, but it didn't put my ip.txt file in /tmp. <br>
+Pretty simple to see why... it's running intermediate containers for each CMD<br>
+
+```
+FROM THE BUILD:
+
+Step 12/15 : CMD ifconfig | grep inet > /tmp/ip.txt
+ ---> Running in af96c63541aa
+Removing intermediate container af96c63541aa
+ ---> 3ab563e438d1
+Step 13/15 : CMD echo "Container IP Address: "
+ ---> Running in 92833a1f649c
+Removing intermediate container 92833a1f649c
+ ---> bc212ec1f041
+Step 14/15 : CMD cat ip.txt
+ ---> Running in 4acc1bb821bf
 ```
 
 <hr>
