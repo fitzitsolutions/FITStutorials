@@ -791,6 +791,22 @@ Removing intermediate container 92833a1f649c
 Step 14/15 : CMD cat ip.txt
  ---> Running in 4acc1bb821bf
 ```
+<br><br>
+But at least all of my installs worked, and I can do ifconfig manually... <br>
+date even shows correctly (ENV worked)<br>
+and I can get to apache using localhost with the port <br>
+<br>
+<img src="../../images/apache_working.png" alt="apache_screenshot" style="width:400px;"/>
+<br><br>
+NOTE:  to check on apache2, I had to use the service command... again, don't use system controls!
+
+```
+root@ctfprac:/# systemctl status apache2
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to connect to bus: Host is down
+root@ctfprac:/# service apache2 status
+ * apache2 is running
+```
 
 <hr>
 
