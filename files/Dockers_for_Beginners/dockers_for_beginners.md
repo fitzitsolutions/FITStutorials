@@ -446,12 +446,179 @@ it would seem that if a container was built and run, the volume is associated wi
 for this learning experience, I'll simply delete the container, and see what's left, then purge.
 <br><br>
 
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/image_rm/) - Remove images
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/rm/) - Remove containers
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/volume_ls/) - Remove Volumes
+
 <hr>
 
 ## REBUILD WITH WHAT I'VE LEARNED SO FAR
 so now it's time to simply rebuild and see what I've learned.<br>
 I want to rebuild the container with apache2 now installed and run it with a new hostname...<br>
+<br>
 
+First, I'm going to check out the images I have so far, and the history behind the ctfpractice image <br>
+NOTE:  there are various ones listed from other projects. <br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker image ls
+REPOSITORY          TAG       IMAGE ID       CREATED        SIZE
+ctfpractice         latest    944741c9f63c   2 hours ago    200MB
+ubuntuctfpractice   latest    4c9a5492d0e6   3 hours ago    200MB
+webexample          latest    ed4d2cebf439   28 hours ago   210MB
+ubuntudocker        latest    ed4d2cebf439   28 hours ago   210MB
+wordpress           latest    c3c92cc3dcb1   4 days ago     616MB
+mysql               5.7       c20987f18b13   5 days ago     448MB
+ubuntu              latest    ba6acccedd29   2 months ago   72.8MB
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker image history ctfpractice
+IMAGE          CREATED        CREATED BY                                      SIZE      COMMENT
+944741c9f63c   2 hours ago    /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "ifco…   0B        
+ff601f59a595   2 hours ago    /bin/sh -c #(nop)  VOLUME [/tmp/ctf]            0B        
+abcd7f9771f0   2 hours ago    /bin/sh -c #(nop)  VOLUME [/tmp/wordlists]      0B        
+0ee44e9645ba   3 hours ago    /bin/sh -c apt-get install -y net-tools nmap…   94.5MB    
+8eb57112853f   3 hours ago    /bin/sh -c apt-get update && apt-get upgrade…   33.1MB    
+ba6acccedd29   2 months ago   /bin/sh -c #(nop)  CMD ["bash"]                 0B        
+<missing>      2 months ago   /bin/sh -c #(nop) ADD file:5d68d27cc15a80653…   72.8MB
+```
+
+<br><br>
+While I do this, I figure I'll take a look at the host's hard drive space... because why not?
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda5        98G   54G   39G  58% /
+```
+
+<br>
+And now to delete some images...
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker image ls
+REPOSITORY          TAG       IMAGE ID       CREATED        SIZE
+ctfpractice         latest    944741c9f63c   2 hours ago    200MB
+ubuntuctfpractice   latest    4c9a5492d0e6   3 hours ago    200MB
+ubuntudocker        latest    ed4d2cebf439   28 hours ago   210MB
+webexample          latest    ed4d2cebf439   28 hours ago   210MB
+wordpress           latest    c3c92cc3dcb1   4 days ago     616MB
+mysql               5.7       c20987f18b13   5 days ago     448MB
+ubuntu              latest    ba6acccedd29   2 months ago   72.8MB
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker image rm ctfpractice
+Error response from daemon: conflict: unable to remove repository reference "ctfpractice" (must force) - container 020d03be8359 is using its referenced image 944741c9f63c
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED             STATUS                           PORTS     NAMES
+d62d97cee747   ctfpractice         "/bin/sh -c ifconfig"    About an hour ago   Exited (0) About an hour ago               frosty_wilbur
+020d03be8359   ctfpractice         "sleep infinity"         2 hours ago         Exited (137) About an hour ago             ctfpractice
+```
+
+<br>
+Here you can see that there's a container that's using the image I was trying to delete.<br>
+Even though it's not running, it's still referenced... so I will try to delete the container.<br>
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker rm 020d03be8359
+020d03be8359
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED             STATUS                         PORTS     NAMES
+d62d97cee747   ctfpractice         "/bin/sh -c ifconfig"    About an hour ago   Exited (0) About an hour ago             frosty_wilbur
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker image rm ctfpractice
+Error response from daemon: conflict: unable to remove repository reference "ctfpractice" (must force) - container d62d97cee747 is using its referenced image 944741c9f63c
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker rm d62d97cee747
+d62d97cee747
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED        STATUS                      PORTS     NAMES
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker image rm ctfpractice
+Untagged: ctfpractice:latest
+Deleted: sha256:944741c9f63c022dae887d9ff44359e1ed0b616ec920b95f5401a1b99a311f35
+Deleted: sha256:ff601f59a5952f3cdea460d180fd2672808e5af2f4a1d30719944c9577cb87d3
+Deleted: sha256:abcd7f9771f0242604b8cec95f18abd93eff801fe5813504192259e94236f9bc
+
+ubuntu:~/Docker/ctfpractice$ sudo docker image ls
+REPOSITORY          TAG       IMAGE ID       CREATED        SIZE
+ubuntuctfpractice   latest    4c9a5492d0e6   4 hours ago    200MB
+ubuntudocker        latest    ed4d2cebf439   29 hours ago   210MB
+webexample          latest    ed4d2cebf439   29 hours ago   210MB
+wordpress           latest    c3c92cc3dcb1   4 days ago     616MB
+mysql               5.7       c20987f18b13   5 days ago     448MB
+ubuntu              latest    ba6acccedd29   2 months ago   72.8MB
+```
+
+<br><br>
+...and now the image is gone.<br>
+so great lessons learned about the relationships between containers and images.<br>
+
+<br><br>
+Now to go back to the hard drive again and see the size after I delete all of thes images.<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker image ls
+REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
+ubuntu       latest    ba6acccedd29   2 months ago   72.8MB
+```
+
+
+
+<br>
+
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/image_rm/) - image commands
+
+<hr>
+
+## EXTRA LEARNING FOR DOCKER WORKINGS
+### NOTE:  tagging is a thing... perhaps an image may be deleted if you remove the tag
+I'll play with this later, but it's a fun reference for further learning.
+<br><br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                      PORTS     NAMES
+bd5d9ad1bfbd   ubuntudocker   "/bin/sh -c '/usr/sb…"   22 hours ago   Exited (137) 22 hours ago             hopeful_moser
+4d32a663871e   wordpress      "docker-entrypoint.s…"   22 hours ago   Created                               some-wordpress
+cfc2f0b85293   webexample     "/bin/sh -c '/usr/sb…"   29 hours ago   Exited (137) 23 hours ago             clever_driscoll
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker image rm ubuntudocker
+Untagged: ubuntudocker:latest
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE          COMMAND                  CREATED        STATUS                      PORTS     NAMES
+bd5d9ad1bfbd   ed4d2cebf439   "/bin/sh -c '/usr/sb…"   22 hours ago   Exited (137) 22 hours ago             hopeful_moser
+4d32a663871e   wordpress      "docker-entrypoint.s…"   22 hours ago   Created                               some-wordpress
+cfc2f0b85293   webexample     "/bin/sh -c '/usr/sb…"   29 hours ago   Exited (137) 23 hours ago             clever_driscoll
+```
+
+<br>
+Also, I want to know more about each referenced SHA while deleting... why were there so many? <BR>
+NOTE: I referenced the TAG when deleting this mysql image... fun stuff!
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker image rm mysql:5.7
+Untagged: mysql:5.7
+Untagged: mysql@sha256:f2ad209efe9c67104167fc609cca6973c8422939491c9345270175a300419f94
+Deleted: sha256:c20987f18b130f9d144c9828df630417e2a9523148930dc3963e9d0dab302a76
+Deleted: sha256:6567396b065ee734fb2dbb80c8923324a778426dfd01969f091f1ab2d52c7989
+Deleted: sha256:0910f12649d514b471f1583a16f672ab67e3d29d9833a15dc2df50dd5536e40f
+Deleted: sha256:6682af2fb40555c448b84711c7302d0f86fc716bbe9c7dc7dbd739ef9d757150
+Deleted: sha256:5c062c3ac20f576d24454e74781511a5f96739f289edaadf2de934d06e910b92
+Deleted: sha256:8805862fcb6ef9deb32d4218e9e6377f35fb351a8be7abafdf1da358b2b287ba
+Deleted: sha256:872d2f24c4c64a6795e86958fde075a273c35c82815f0a5025cce41edfef50c7
+Deleted: sha256:6fdb3143b79e1be7181d32748dd9d4a845056dfe16ee4c827410e0edef5ad3da
+Deleted: sha256:b0527c827c82a8f8f37f706fcb86c420819bb7d707a8de7b664b9ca491c96838
+Deleted: sha256:75147f61f29796d6528486d8b1f9fb5d122709ea35620f8ffcea0e0ad2ab0cd0
+Deleted: sha256:2938c71ddf01643685879bf182b626f0a53b1356138ef73c40496182e84548aa
+Deleted: sha256:ad6b69b549193f81b039a1d478bc896f6e460c77c1849a4374ab95f9a3d2cea2
+```
 
 <hr>
 
