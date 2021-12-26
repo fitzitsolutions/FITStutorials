@@ -293,6 +293,66 @@ Now that I have the basics figured out... I can move to using docker-compose to 
 
 <hr>
 
+## EXTRA LEARNING FOR DOCKER WORKINGS
+### NOTE:  container stopped but can't be run again with the same command
+<br><br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -d --name=ctfpractice -v /tmp/ctfpractice/wordlist:/tmp/wordlist:rw -v /tmp/ctfpractice/ctf:/tmp/ctf:rw ctfpractice sleep infinity
+docker: Error response from daemon: Conflict. The container name "/ctfpractice" is already in use by container "020d03be8359411de04a5f76d8bd1e87a4d09db79f279f8ca86492804c80283a". You have to remove (or rename) that container to be able to reuse that name.
+See 'docker run --help'.
+```
+
+<br><br>
+Always fun to figure things out by mistake... 
+<br>
+since the container was built and run, all I have to do now is start it again
+<br>
+as you can see, I just tried the commands without the flags, then figured out to simply start it.
+<br><br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED             STATUS                           PORTS     NAMES
+020d03be8359   ctfpractice         "sleep infinity"         25 minutes ago      Exited (137) 6 minutes ago                 ctfpractice
+bbb364cb8169   ubuntuctfpractice   "sleep infinity"         About an hour ago   Exited (137) 35 minutes ago                ubuntuctfpractice
+5092ed449b83   ubuntuctfpractice   "sleep infinity"         About an hour ago   Exited (137) About an hour ago             ecstatic_mclean
+647cb8e9e48a   ubuntuctfpractice   "/bin/sh -c ifconfig"    About an hour ago   Exited (0) About an hour ago               eager_sanderson
+5e42db3c2d35   ubuntuctfpractice   "/bin/sh -c ifconfig"    About an hour ago   Exited (0) About an hour ago               admiring_easley
+accdbe9028ea   ubuntuctfpractice   "/bin/sh -c ifconfig"    2 hours ago         Exited (0) 2 hours ago                     confident_thompson
+bd5d9ad1bfbd   ubuntudocker        "/bin/sh -c '/usr/sb…"   20 hours ago        Exited (137) 20 hours ago                  hopeful_moser
+4d32a663871e   wordpress           "docker-entrypoint.s…"   20 hours ago        Created                                    some-wordpress
+cfc2f0b85293   webexample          "/bin/sh -c '/usr/sb…"   27 hours ago        Exited (137) 21 hours ago                  clever_driscoll
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker start -d --name=ctfpractice -v /tmp/ctfpractice/wordlist:/tmp/wordlist:rw -v /tmp/ctfpractice/ctf:/tmp/ctf:rw ctfpractice sleep infinity
+unknown shorthand flag: 'd' in -d
+See 'docker start --help'.
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps
+CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker start --name=ctfpractice -v /tmp/ctfpractice/wordlist:/tmp/wordlist:rw -v /tmp/ctfpractice/ctf:/tmp/ctf:rw ctfpractice sleep infinity
+unknown flag: --name
+See 'docker start --help'.
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker start ctfpractice
+ctfpractice
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps
+CONTAINER ID   IMAGE         COMMAND            CREATED          STATUS         PORTS     NAMES
+020d03be8359   ctfpractice   "sleep infinity"   26 minutes ago   Up 4 seconds             ctfpractice
+```
+
+<hr>
+
+## DO THINGS WITH THE CONTAINER...
+It's time to build out a simple web server.  I'm going to use apache2 on ubunu
+<br><br>
+
+
+
+<hr>
+
 ## THE YML (OR YAML) FILE
 You can orchestrate multiple docker containers using a .yml file
 <br>
