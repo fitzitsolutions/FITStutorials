@@ -562,9 +562,15 @@ so great lessons learned about the relationships between containers and images.<
 Now to go back to the hard drive again and see the size after I delete all of thes images.<br>
 
 ```
-@ubuntu:~/Docker/ctfpractice$ sudo docker image ls
-REPOSITORY   TAG       IMAGE ID       CREATED        SIZE
-ubuntu       latest    ba6acccedd29   2 months ago   72.8MB
+BEFORE:
+@ubuntu:~/Docker/ctfpractice$ sudo df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda5        98G   54G   39G  58% /
+
+AFTER:
+@ubuntu:~/Docker/ctfpractice$ sudo df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/sda5        98G   53G   41G  57% /
 ```
 
 
