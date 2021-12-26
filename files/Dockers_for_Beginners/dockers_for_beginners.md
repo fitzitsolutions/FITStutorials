@@ -346,9 +346,111 @@ CONTAINER ID   IMAGE         COMMAND            CREATED          STATUS         
 <hr>
 
 ## DO THINGS WITH THE CONTAINER...
-It's time to build out a simple web server.  I'm going to use apache2 on ubunu
+It's time to build out a simple web server.  I'm going to use apache2 on ubunu <br>
+[Web Server Build](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Ubuntu_Server_Build/Ubuntu_Server_Creation.md) - I'll use my own reference to build a web server container.
 <br><br>
 
+The first thing I did was try to change the hostname <br>
+the command hostnamectl wasn't available, so I tried to install systemd to get it<br>
+in doing this, I see that tzdata stops the installation by asking for the regional information (this changes your date) <br>
+
+```
+Configuring tzdata
+------------------
+
+Please select the geographic area in which you live. Subsequent configuration questions will narrow this down by presenting a list of cities, representing the
+time zones in which they are located.
+
+  1. Africa  2. America  3. Antarctica  4. Australia  5. Arctic  6. Asia  7. Atlantic  8. Europe  9. Indian  10. Pacific  11. SystemV  12. US  13. Etc
+Geographic area: 12
+
+Please select the city or region corresponding to your time zone.
+
+  1. Alaska  2. Aleutian  3. Arizona  4. Central  5. Eastern  6. Hawaii  7. Indiana-Starke  8. Michigan  9. Mountain  10. Pacific  11. Samoa
+Time zone: 10
+
+```
+
+<br>
+
+After installing systemd within the container and doing a restart of the container, I get this:
+<br><br>
+
+```
+root@020d03be8359:/# hostnamectl set-hostname ctfpractice.the-petting-zoo.com
+System has not been booted with systemd as init system (PID 1). Can't operate.
+Failed to create bus connection: Host is down
+```
+
+### EASY ANSER TO THIS CONUNDRUM
+this is a system command and shouldn't be run within a container
+
+### But what if I still wanted to change the hostname?
+the -h flag should change the hostname when running the container... but doing that gives multiple instances of the container
+<br><br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -h ctfpractice.the-petting-zoo.com ctfpractice
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+CONTAINER ID   IMAGE               COMMAND                  CREATED          STATUS                            PORTS     NAMES
+d62d97cee747   ctfpractice         "/bin/sh -c ifconfig"    3 minutes ago    Exited (0) 3 minutes ago                    frosty_wilbur
+020d03be8359   ctfpractice         "sleep infinity"         53 minutes ago   Exited (137) About a minute ago             ctfpractice
+```
+
+<br><br>
+I'm still thinking like a VM admin... not a docker admin.<br>
+Do it all with the build, not after the container exists!<br>
+...so with that out of the way, let's move on.
+
+<hr>
+
+## EXTRA LEARNING FOR DOCKER WORKINGS
+### NOTE:  volumes were created with my previous commands.
+<br><br>
+Reference:
+
+```
+-v /tmp/ctfpractice/wordlist:/tmp/wordlist:rw -v /tmp/ctfpractice/ctf:/tmp/ctf:rw
+```
+
+<br>
+List the volumes with the docker volume ls command
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker volume ls
+DRIVER    VOLUME NAME
+local     0bfed272493af3c73cbdc39114cd38e5d15bdc2dda9ae81e94d20cf55d89f57b
+local     3ff7d81783cebab753d939058fb603571c75f098a51adb3e6edaf97b4a2ec6f3
+local     4c7a99845d6daccc6bfcf2de53c3e04b2a4f74cf1f686d43a2b21d53e0be2610
+local     24a5bda0dec6c0eae93743eb8c3f5f526f250ebbcbc7a1634e7c20b20035a9ad
+local     43cca820c95f5d991b2b5985bb5b58de43970957c8cf93863b906786039ab2a1
+local     51b95f241fbb05d2828f40af8a0df22cf68990abb8c4d4b164a4968e0d280645
+local     59fb9b92471fcad577f5a88d8effa9b8cfdd370247847f7744bf874c9aa1a8f5
+local     894de2554f15b550069ebbac9ac9b2efdb1c2fbfad3ff747938c65514b06678f
+local     6900d91c609bb9f198f09737d0f04efab59227e505b2e24c904668e6b510dc10
+local     583064f664d33dede9c0c744b294d3ac61842e75055dc454eb6d0dd0988c1d21
+local     607700e69278dc42be9fbcf274b5160c572186a9267818c116dbf3b735f05e1c
+local     88691349b0eb09ac05cd81b2b69335703f356692eb3be24d3c72b1822de3c688
+local     b5834fa8416862af656e9192615b743db7cf3f4781a0044c682b2f8308e8a9e8
+local     c91aa53a910bf26b3838b1c455c1699e3bc36a4f23af5a5ab832ad9b32f95bb3
+```
+
+<br>
+I can use docker volume prune to remove any unused volumes, <br>
+and docker volume rm to remove used ones. <br>>
+...but at this point, I'm wondering how the used ones are attached to containers.<br>
+it would seem that if a container was built and run, the volume is associated with that container. <br>
+...makes sense, if I need the container, I need the volume that's supposed to be in it.<br>
+for this learning experience, I'll simply delete the container, and see what's left, then purge.
+<br><br>
+
+<hr>
+
+## REBUILD WITH WHAT I'VE LEARNED SO FAR
+so now it's time to simply rebuild and see what I've learned.<br>
+I want to rebuild the container with apache2 now installed and run it with a new hostname...<br>
 
 
 <hr>
