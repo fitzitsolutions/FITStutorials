@@ -228,7 +228,7 @@ The build was REALY fast...
 
 ```
 ubuntu:~/Docker/ctfpractice$ sudo docker build . -t ctfpractice
-[sudo] password for fitsadmin: 
+[sudo] password for admin: 
 Sending build context to Docker daemon  4.096kB
 Step 1/6 : FROM ubuntu:latest
  ---> ba6acccedd29
@@ -745,7 +745,7 @@ And finally, we run the docker to see if it all worked...
 ```
 sudo docker run -p 8005:80 --hostname=ctfprac --name=apachetpz -d ctfpractice
 7b52146ac96f6d4493969123ee6fd098d7c2aeffb5503397995b5b038b9d000b
-fitsadmin@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
+admin@ubuntu:~/Docker/ctfpractice$ sudo docker ps -a
 CONTAINER ID   IMAGE         COMMAND                  CREATED         STATUS         PORTS                                   NAMES
 7b52146ac96f   ctfpractice   "/bin/sh -c '/usr/sb…"   4 seconds ago   Up 4 seconds   0.0.0.0:8005->80/tcp, :::8005->80/tcp   apachetpz
 ```
@@ -994,6 +994,45 @@ Sweet!
 
 At this point, I'll be able to create a php application that is vulnerable to something.<br>
 This will be the basic framework for all web challenges in the CTF...<br>
+<br><br>
+Following the trail I left behind, I can get the IP and do an NMAP scan...<br>
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker exec -it phptpz cat /tmp/ip.txt
+        inet 172.17.0.2  netmask 255.255.0.0  broadcast 172.17.255.255
+        inet 127.0.0.1  netmask 255.0.0.0
+```
+
+NMAP shows the open connection to the IP:<br>
+
+```
+Nmap scan report for 172.17.0.2
+Host is up (0.00015s latency).
+Not shown: 999 closed ports
+PORT   STATE SERVICE
+80/tcp open  http
+```
+
+<br><br>
+Lastly for this part of my learning... seeing what running a new container will do for the network:<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -d -p 8006:80 --name=phptpz2 -v /tmp/ctfpractice/phpfile:/var/www/html:rw ctfpractice
+038d1e07465c2702c8d1ea28f424c2a70846ffcbcc0af3a079ffd092091fc9db
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps 
+CONTAINER ID   IMAGE         COMMAND                  CREATED          STATUS          PORTS                                   NAMES
+038d1e07465c   ctfpractice   "/bin/sh -c '/usr/sb…"   6 seconds ago    Up 5 seconds    0.0.0.0:8006->80/tcp, :::8006->80/tcp   phptpz2
+47f32fde0a75   ctfpractice   "/bin/sh -c '/usr/sb…"   18 minutes ago   Up 18 minutes   0.0.0.0:8005->80/tcp, :::8005->80/tcp   phptpz
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker exec -it phptpz2 ifconfig
+eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        inet 172.17.0.3  netmask 255.255.0.0  broadcast 172.17.255.255
+```
+
+<br>
+and as expected, it created a new container with its own IP... good to know!
 
 <hr>
 
