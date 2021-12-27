@@ -1074,11 +1074,75 @@ FOR SUDO:
 RUN useradd -rm -d /home/user_name -s /bin/bash -g root -G sudo -u 1001 user_name
 
 FOR NON SUDO:
-RUN useradd -rm -d /home/user_name -s /bin/bash -g root -G -u 1001 user_name
+RUN useradd -rm -d /home/user_name -s /bin/bash -u 1001 user_name
 ```
 
 <br><br>
 DONE FOR TONIGHT (this was all in one day), BUT I'LL BE BACK...
+
+<br><br>
+Stayed up to do more...  working on user.  Turns out, I don't have to delete the image each time, jsut rebuild it...<br>
+So I added a line to the dockerfile:<br>
+
+```
+# CREATE USER
+RUN useradd -rm -d /home/tpzuser -s /bin/bash -u 1001 tpzuser
+```
+
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -d -p 8000:80 --name=phptpz -v /tmp/ctfpractice/phpfile:/var/www/html:rw ctfpractice
+6325d1347321738dcc1a7af76e30b459799e9e55e052c7235bf4e7426b31aa80
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker exec -it phptpz /bin/bash
+root@6325d1347321:/# ls
+bin  boot  dev  etc  home  lib  lib32  lib64  libx32  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@6325d1347321:/# cat /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+[...]
+tpzuser:x:1001:999::/home/tpzuser:/bin/bash
+```
+
+<br><br>
+So with this new user, everything is working fine. <br>
+I can just add the file into the build... going to try that. <br>
+<br>
+added this to the dockerfile:<br>
+<br>
+
+```
+# ADD A FLAG
+RUN echo "tpz{flag}" >> /home/tpzuser/user.txt
+```
+<br>
+
+and worked like a champ! <br>
+<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -d -p 8000:80 --name=phptpz -v /tmp/ctfpractice/phpfile:/var/www/html:rw ctfpractice
+38496ee4bae46701d9b7edd1e6a8dd055c46e044d290ad11b615f31363e573e7
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker exec -it phptpz /bin/bash
+
+root@38496ee4bae4:/# ls
+bin  boot  dev  etc  home  lib  lib32  lib64  libx32  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
+root@38496ee4bae4:/# cd /home/tpzuser/
+root@38496ee4bae4:/home/tpzuser# ls
+user.txt
+root@38496ee4bae4:/home/tpzuser# cat user.txt 
+tpz{flag}
+```
+<br><br>
+
+<hr>
+
+## NOW FOR MYSQL
+Time to build an image and container for MySQL... pretty sure one already exists.<br>
+
+<br><br>
+NO REALLY... NOW I'M DONE FOR THE NIGHT!  WILL DO MORE TOMORROW...
+<br><br>
 
 <hr>
 
