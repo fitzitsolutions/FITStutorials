@@ -300,7 +300,7 @@ testctf.txt  withinthecontainer.txt
 ```
 
 <br><br>
-Now that I have the basics figured out... I can move to using docker-compose to orchestrate all of this...
+Now that I have the basics figured out... I can move to building a container for apache2 in ubuntu
 <br><br>
 
 [Docker Docs](https://docs.docker.com/storage/volumes/) - Reference for volumes
