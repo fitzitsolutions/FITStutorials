@@ -931,7 +931,66 @@ CMD /usr/sbin/apache2ctl -D FOREGROUND
 
 ## TEST PHP IN THE DOCKER
 Now it's time to test those PHP installs.  Now that I know my build is basic, but good, I can do more...<br> 
+<br>
 
+### NEW GOAL FOR THIS IMAGE
+
+- Create files on my host to push to the image (php test file)
+- prune all volumes from deleted images (sudo docker volume prune)
+- attach a volume for the run (reference the -v flag from earlier)
+- run the php file from the attached volume using apache
+
+<br><br>
+
+Too easy... <br>
+<br><br>
+Created a php file (yes, I know I got ahead of myself with the mysql part... but getting there)<br>
+<br>
+
+```
+<html>
+<head>
+    <title>PHP Test</title>
+</head>
+    <body>
+    <?php echo '<p>Hello World</p>';
+
+    // In the variables section below, replace user and password with your own MySQL credentials as created on your server
+    $servername = "localhost";
+    $username = "webuser";
+    $password = "password";
+
+    // Create MySQL connection
+    $conn = mysqli_connect($servername, $username, $password);
+
+    // Check connection - if it fails, output will include the error message
+    if (!$conn) {
+        die('<p>Connection failed: </p>' . mysqli_connect_error());
+    }
+    echo '<p>Connected successfully</p>';
+    ?>
+</body>
+</html>
+
+```
+
+Ran with:<br>
+
+```
+sudo docker run -d -p 8005:80 --name=phptpz -v /tmp/ctfpractice/phpfile:/var/www/html:rw ctfpractice
+```
+
+<img src="../../images/phptest_success.png" alt="php_screenshot" style="width:400px;"/>
+<br><br>
+
+Now I'm going to change it on the host to index.php and see what happens...<br>
+<br>
+
+<img src="../../images/phptest2_success.png" alt="php_screenshot" style="width:400px;"/>
+<br><br>
+
+Sweet!
+<br><br>
 
 <hr>
 
