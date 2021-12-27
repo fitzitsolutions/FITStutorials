@@ -992,6 +992,9 @@ Now I'm going to change it on the host to index.php and see what happens...<br>
 Sweet!
 <br><br>
 
+At this point, I'll be able to create a php application that is vulnerable to something.<br>
+This will be the basic framework for all web challenges in the CTF...<br>
+
 <hr>
 
 ## THE YML (OR YAML) FILE
