@@ -1034,6 +1034,52 @@ eth0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
 <br>
 and as expected, it created a new container with its own IP... good to know!
 
+
+<hr>
+
+## USERS! - we need 'em
+Now that we have a good environment with apache running and files that can be changed as needed, I need to create users.<br>
+The logical next step would be to create the mysql container and link it... but that'll be during chellenge development.<br>
+This should involve creating the user, and giving them permission to run commands (perhaps GTFObins accessible?)<br>
+<br><br>
+I came across this in [Docker Docs](https://docs.docker.com/engine/reference/builder/#syntax)<br>
+but it mods a directory... same with chown and other commands using ADD... see documentation
+
+```
+ADD [--chown=<user>:<group>] <src>... <dest>
+ADD [--chown=<user>:<group>] ["<src>",... "<dest>"]
+```
+<br><br>
+Instead, I'd like to concentrate on the USER portion of the documentation.<br>
+Here's an excerpt:<br>
+
+```
+The USER instruction sets the user name (or UID) and optionally the user group (or GID) to use when running the image and for any RUN, CMD and ENTRYPOINT instructions that follow it in the Dockerfile.
+```
+<br><br>
+It looks like you create the user, and run commands by the user after...<br>
+Each of these dockerfile instructions run in order... so I plan to use that.<br>
+A fun thing to use for thise type of thing would be ENV variables for user working directories.<br>
+<br>
+It should be pretty easy to put all of this together...<br>
+<br>
+Here's some examples for my references as I build this...<br>
+
+```
+ENV DIRPATH=/path
+
+WORKDIR $DIRPATH/file.txt
+
+FOR SUDO:
+RUN useradd -rm -d /home/user_name -s /bin/bash -g root -G sudo -u 1001 user_name
+
+FOR NON SUDO:
+RUN useradd -rm -d /home/user_name -s /bin/bash -g root -G -u 1001 user_name
+```
+
+<br><br>
+DONE FOR TONIGHT (this was all in one day), BUT I'LL BE BACK...
+
 <hr>
 
 ## THE YML (OR YAML) FILE
