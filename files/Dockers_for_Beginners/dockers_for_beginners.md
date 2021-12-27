@@ -267,9 +267,11 @@ reference that there are three directories in /tmp, and one is plural by acciden
 ```
 @ubuntu:~/Docker/ctfpractice$ sudo docker run -d --name=ctfpractice -v /tmp/ctfpractice/wordlist:/tmp/wordlist:rw -v /tmp/ctfpractice/ctf:/tmp/ctf:rw ctfpractice sleep infinity
 020d03be8359411de04a5f76d8bd1e87a4d09db79f279f8ca86492804c80283a
+
 @ubuntu:~/Docker/ctfpractice$ sudo docker ps
 CONTAINER ID   IMAGE         COMMAND            CREATED         STATUS         PORTS     NAMES
 020d03be8359   ctfpractice   "sleep infinity"   7 seconds ago   Up 6 seconds             ctfpractice
+
 @ubuntu:~/Docker/ctfpractice$ sudo docker exec -it ctfpractice /bin/bash
 root@020d03be8359:/# ls
 bin  boot  dev  etc  home  lib  lib32  lib64  libx32  media  mnt  opt  proc  root  run  sbin  srv  sys  tmp  usr  var
@@ -776,6 +778,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 <br>
 Now ifconfig works just fine, but it didn't put my ip.txt file in /tmp. <br>
 Pretty simple to see why... it's running intermediate containers for each CMD<br>
+NOTE: That may be because I'm using CMD instad of RUN (I'll check that)<br>
 
 ```
 FROM THE BUILD:
@@ -794,8 +797,15 @@ Step 14/15 : CMD cat ip.txt
 <br><br>
 But at least all of my installs worked, and I can do ifconfig manually... <br>
 date even shows correctly (ENV worked)<br>
+also, the hostname flag worked,<br>
 and I can get to apache using localhost with the port <br>
 <br>
+
+```
+root@ctfprac:/# hostname
+ctfprac
+```
+
 <img src="../../images/apache_working.png" alt="apache_screenshot" style="width:400px;"/>
 <br><br>
 NOTE:  to check on apache2, I had to use the service command... again, don't use system controls!
@@ -807,6 +817,121 @@ Failed to connect to bus: Host is down
 root@ctfprac:/# service apache2 status
  * apache2 is running
 ```
+
+<br><br>
+From the history command... I may have figured out the SHA thing from before:<br>
+During the build, the commands are run on top of eachother while the final image is at the top.<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker history ctfpractice
+IMAGE          CREATED         CREATED BY                                      SIZE      COMMENT
+18d2cadc3ca1   3 minutes ago   /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "/usr…   0B        
+87cb94c465a8   3 minutes ago   /bin/sh -c #(nop)  EXPOSE 80                    0B        
+6547ac16bdc8   3 minutes ago   /bin/sh -c echo "# Add IP here " >> /etc/hos…   0B        
+27e29fad0b88   3 minutes ago   /bin/sh -c a2dissite 000-default                0B        
+b0aea7375258   3 minutes ago   /bin/sh -c apache2ctl configtest                0B        
+27a3edd02ad8   3 minutes ago   /bin/sh -c echo "ServerName Localhost" >> /e…   7.25kB    
+8dd335f4cf81   3 minutes ago   /bin/sh -c ifconfig | grep inet > /tmp/ip.txt   113B      
+2ebc275e74d4   3 minutes ago   /bin/sh -c apt clean                            0B        
+666ed3173d60   3 minutes ago   /bin/sh -c apt install -y   php   php-cli   …   103MB     
+25a7115f7b35   3 minutes ago   /bin/sh -c apt install -y   net-tools   apac…   114MB     
+1ad707716eb2   4 minutes ago   /bin/sh -c apt update && apt-get upgrade -y     33.1MB    
+274ca0da8167   4 minutes ago   /bin/sh -c ln -snf /usr/share/zoneinfo/$TZ /…   59B       
+fbd369ad0032   4 minutes ago   /bin/sh -c #(nop)  ENV TZ=America/Los_Angeles   0B        
+ba6acccedd29   2 months ago    /bin/sh -c #(nop)  CMD ["bash"]                 0B
+```
+<br><br>
+COOL!  Success on what I set out to do...  here's everything after the build:<br>
+
+```
+@ubuntu:~/Docker/ctfpractice$ sudo docker run -p 8005:80 --hostname=ctfprac --name=apachetpz -d ctfpractice
+518b823e90c0b9a3b22f133f760b3435b78cdad3dc5550afcdcda9be8ff07603
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED         STATUS         PORTS                                   NAMES
+518b823e90c0   ctfpractice   "/bin/sh -c '/usr/sb…"   3 seconds ago   Up 2 seconds   0.0.0.0:8005->80/tcp, :::8005->80/tcp   apachetpz
+
+@ubuntu:~/Docker/ctfpractice$ sudo docker exec -it apachetpz /bin/bash
+root@ctfprac:/# ls /tmp/
+ip.txt
+root@ctfprac:/# cat /tmp/ip.txt 
+        inet 172.17.0.2  netmask 255.255.0.0  broadcast 172.17.255.255
+        inet 127.0.0.1  netmask 255.0.0.0
+root@ctfprac:/# hostname
+ctfprac
+root@ctfprac:/# cat /etc/hosts
+127.0.0.1	localhost
+::1	localhost ip6-localhost ip6-loopback
+fe00::0	ip6-localnet
+ff00::0	ip6-mcastprefix
+ff02::1	ip6-allnodes
+ff02::2	ip6-allrouters
+172.17.0.2	ctfprac
+```
+
+<br><br>
+
+And finall, here's the cleaned up version of my dockerfile:<br>
+
+```
+FROM ubuntu:latest
+
+# ENVIRONMENTALS
+ENV TZ=America/Los_Angeles
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+# UPDATE AND UPGRADE
+RUN apt update && apt-get upgrade -y
+
+# INSTALL FOR IFCONFIG AND WEBSERVER
+RUN apt install -y \ 
+		net-tools \
+		apache2
+
+# INSTALL PHP
+RUN apt install -y \ 
+		php \
+		php-cli \
+		php-fpm \
+		php-json \
+		php-common \
+		php-mysql \
+		php-zip \
+		php-gd \
+		php-mbstring \
+		php-curl \
+		php-xml \
+		php-pear \
+		php-bcmath \
+		php-curl \
+		php-json \
+		php-cgi \
+		php-mysql
+
+# CLEAN UP ALL OF THE INSTALLATIONS
+RUN apt clean
+
+# RECORD IP ADDRESS
+RUN ifconfig | grep inet > /tmp/ip.txt
+
+# WRITE APACHE CONFIGS
+RUN echo "ServerName Localhost" >> /etc/apache2/apache2.conf
+RUN apache2ctl configtest
+RUN a2dissite 000-default
+
+# OPEN PORT 80
+EXPOSE 80
+
+# START APACHE
+CMD /usr/sbin/apache2ctl -D FOREGROUND
+```
+
+
+<hr>
+
+## TEST PHP IN THE DOCKER
+Now it's time to test those PHP installs.  Now that I know my build is basic, but good, I can do more...<br> 
+
 
 <hr>
 
