@@ -1143,6 +1143,68 @@ Time to build an image and container for MySQL... pretty sure one already exists
 <br><br>
 NO REALLY... NOW I'M DONE FOR THE NIGHT!  WILL DO MORE TOMORROW...
 <br><br>
+Back to it...<br>
+NOTE: The /etc/hosts addition will come in handy:<br>
+
+```
+Your container will have lines in /etc/hosts which define the hostname of the container itself as well as localhost and a few other common things. The --add-host flag can be used to add additional lines to /etc/hosts
+```
+[Docker Docs](https://docs.docker.com/engine/reference/run/) - RUN command references <br>
+
+This will be great if we're running services and want to reference multipe containers easily.
+<br><br>
+Okay, back to MySql... going to search for a good image and run it.<br>
+Pretty simple to pull the latest image.  Here's a great tutorial:<br>
+
+[Phoenixnap.com](https://phoenixnap.com/kb/mysql-docker-container) - Tutorial on MySQL containers <br>
+<br><br>
+
+So here's the breakdown:<br>
+
+```
+PULL THE IMAGE
+sudo docker pull mysql/mysql-server:latest
+
+RUN AND TAG THE IMAGE
+sudo docker run --name=[container_name] -d [image_tag_name]
+
+CHECK LOGS FROM THE HOST
+apt-get install mysql-client
+sudo docker logs [container_name]
+
+CHANGE CONFIGURATIONS THROUGH BASH
+sudo docker exec -it [container_name] bash
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY '[newpassword]';
+
+MAKE CUSTOM CONFIGS AVAILABLE TO MYSQL 
+sudo mkdir -p /root/docker/[container_name]/conf.d
+sudo nano /root/docker/[container_name]/conf.d/my-custom.cnf
+
+DOCKER RUN COMMAND
+docker run \
+--detach \
+--name=[container_name] \
+--env="MYSQL_ROOT_PASSWORD=[my_password]" \
+--publish 6603:3306 \
+--volume=/root/docker/[container_name]/conf.d:/etc/mysql/conf.d \
+mysql
+
+OR STORAGE ON THE HOST VIA RUN COMMAND
+docker run \
+--detach \
+--name=[container_name] \
+--env="MYSQL_ROOT_PASSWORD=my_password" \
+--publish 6603:3306 \
+--volume=/root/docker/[container_name]/conf.d:/etc/mysql/conf.d \
+--volume=/storage/docker/mysql-data:/var/lib/mysql \
+mysql
+```
+
+<br><br>
+Easy Peasy!<br>
+At this point, I can write my php applications to connect to the running container.<br>
+I don't feel like there's any need for a dockerfile for MySQL... just use the RUN flags. <br>
+
 
 <hr>
 
