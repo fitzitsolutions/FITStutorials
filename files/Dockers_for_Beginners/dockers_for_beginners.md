@@ -1166,7 +1166,7 @@ PULL THE IMAGE
 sudo docker pull mysql/mysql-server:latest
 
 RUN AND TAG THE IMAGE
-sudo docker run --name=[container_name] -d [image_tag_name]
+sudo docker run --hostname=[host_name] -p 6603:3306 --name=[container_name] -d [image_tag_name]
 
 CHECK LOGS FROM THE HOST
 apt-get install mysql-client
@@ -1204,7 +1204,39 @@ mysql
 Easy Peasy!<br>
 At this point, I can write my php applications to connect to the running container.<br>
 I don't feel like there's any need for a dockerfile for MySQL... just use the RUN flags. <br>
+<br><br>
 
+Running the container requires you to specify the root password and some other things, so keep that in mind.<br>
+But all connections were solid:<br>
+
+```
+@ubuntu:~/Docker/ctf/ctfmysql$ mysql -uroot -ptestpassword -h127.0.0.1 -P6603 
+mysql: [Warning] Using a password on the command line interface can be insecure.
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 12
+Server version: 8.0.27 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2021, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+4 rows in set (0.00 sec)
+
+mysql> exit
+```
 
 <hr>
 
