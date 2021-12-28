@@ -1042,7 +1042,10 @@ Now that we have a good environment with apache running and files that can be ch
 The logical next step would be to create the mysql container and link it... but that'll be during chellenge development.<br>
 This should involve creating the user, and giving them permission to run commands (perhaps GTFObins accessible?)<br>
 <br><br>
-I came across this in [Docker Docs](https://docs.docker.com/engine/reference/builder/#syntax)<br>
+I came across this in 
+
+[Docker Docs](https://docs.docker.com/engine/reference/builder/#syntax)<br>
+
 but it mods a directory... same with chown and other commands using ADD... see documentation
 
 ```
@@ -1243,7 +1246,236 @@ mysql> show databases;
 
 mysql> exit
 ```
+<br><br>
 
+<hr>
+
+## CREATE A CHALLENGE
+Now that we have Apache working in an Ubuntu container and MySQL ready, I'll put them together to create a challenge.<br>
+<br><br>
+First... download a wordpress installation... I'll use 5.7.2 <br>
+
+[Wordpress v5.7.2](https://wordpress.org/download/releases/) - Wordpress Archive
+
+Then... download a vulnerable plugin... I'll use BuddyPress v7.0-beta<br>
+
+[Vulnerable BuddyPress](https://buddypress.org/2020/11/buddypress-7-0-0-beta2/) - BuddyPress 7.0.0-beta2
+
+Then... change permissions to the www directory... I'll use my own script.<br>
+<br>
+
+```
+#!/bin/bash
+
+echo "This script will:"
+echo "1. CHANGE PERMISSIONS TO $1"
+echo ""
+
+read -p "Do you want to run this shell? [y/n]" answer
+if [[ $answer = y ]] ; then
+
+echo "Changing permissions to $1"
+echo ""
+
+chown -R www-data:www-data $1
+find $1 -type d -exec chmod 750 {} \;
+find $1 -type f -exec chmod 640 {} \;
+ls -alh $1
+
+echo "done..."
+
+fi
+```
+<br><br>
+And now put it all together using the containers above.<br>
+Run the mysql container script, then grab its IP address using this:<br>
+
+```
+#!/bin/bash
+
+# USAGE:
+# sudo ./scriptname.sh [container_name]
+
+docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' $1
+```
+<br><br>
+You'll need to change the wp-config.php file and add the database to your mysql (standard Wordpress).<br>
+Just in case you're new to this... here's the breakdown:<br>
+
+<br><br>
+excerpts from your Wordpress config file:<br>
+
+```
+@ubuntu:/tmp/ctfpractice/ctfWPbuddypress/www$ cat wp-config.php 
+[...]
+define( 'DB_NAME', 'BEMYBUDDY' );
+define( 'DB_USER', 'buddyadmin' );
+define( 'DB_PASSWORD', 'buddypassword' );
+define( 'DB_HOST', '172.17.0.2' );
+[...]]
+```
+
+<br><br>
+Your MySQL commands to add database and user from that config file:<br>
+
+```
+FROM YOUR HOST USING MYSQL-CLIENT
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/mysql$ mysql -uroot -ptestpassword -h172.17.0.2 -P3306
+
+mysql> create database BEMYBUDDY;
+Query OK, 1 row affected (0.00 sec)
+
+mysql> CREATE USER 'buddyadmin'@'172.17.0.3' IDENTIFIED BY 'buddypassword';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> GRANT ALL ON BEMYBUDDY.* TO 'buddyadmin'@'172.17.0.3';
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> flush privileges;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+<br><br>
+When running the Apache docker, I see that although I changed the permissions on the host, they're not changed on the dontainer.<br>
+I can use the same script to take care of this...<br>
+Also, I figured out that I didn't install vim into the image... need to fix that (my favorite editor)<br>
+<br><br>
+Now first, check to make sure that the Apache container will talk to the MySQL container using the creds:<br>
+<br>
+
+```
+@ubuntu:~/Docker/ctf/Defaults/Scripts$ sudo docker exec -it ctfWPbuddypresswww bash
+root@177907cb5c64:/#
+
+root@177907cb5c64:/# sudo apt install mysql-client
+
+root@177907cb5c64:/# mysql -uroot -ptestpassword -h172.17.0.2 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| BEMYBUDDY          |
+| information_schema |
+| mysql              |
+| performance_schema |
+| sys                |
++--------------------+
+
+root@177907cb5c64:/# mysql -ubuddyadmin -pbuddypassword -h172.17.0.2 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| BEMYBUDDY          |
+| information_schema |
++--------------------+
+```
+<br>
+Good to go on that!<br>
+I can also use my php file above (I told you I'd get back to it) to show that apache works with php and databases.<br>
+I change the connections to:<br>
+
+```
+    $servername = "172.17.0.2";
+    $username = "buddyadmin";
+    $password = "buddypassword";
+```
+
+<br>
+
+<img src="../../images/phptest3_success.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+And after doing the famous 5-minute wordpress install... we're into our installation.<br>
+
+<br>
+
+<img src="../../images/wordpress_success.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+Now let's install the vulnerable plugin... <br>
+
+<br>
+
+<img src="../../images/buddypress_upload.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+OOPS...<br>
+
+<br>
+
+<img src="../../images/upload_size.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+I'll fix that realy quick...<br>
+... and proceeded to break the container, ha!<br>
+<br>
+
+Added this to the end of the file /etc/php/7.4/apache2/php.ini<br>
+
+```
+upload_max_filesize = 200M
+post_max_size = 200M
+memory_limit = 500M
+max_execution_time = 600
+max_input_vars = 1000
+max_input_time = 400
+```
+<br><br>
+
+And then tried to restart apache... but it killed the container and threw and error...<br>
+
+```
+root@79086762910c:/etc/php/7.4/apache2# service apache2 restart
+ * Restarting Apache httpd web server apache2                                                                                                                       pidof: can't read from 5401/stat
+
+@ubuntu:~/Docker/ctf/Defaults/Scripts$ sudo docker exec -it ctfWPbuddypresswww bash
+[sudo] password for admin: 
+Error response from daemon: Container 79086762910c273a3289c77e0234842eaf00d15b0f159f227563e8b8d4313575 is not running
+
+@ubuntu:~/Docker/ctf/Defaults/Scripts$ sudo docker start ctfWPbuddypressmysql
+ctfWPbuddypressmysql
+
+ubuntu:~/Docker/ctf/Defaults/Scripts$ sudo docker exec -it ctfWPbuddypresswww bash
+Error response from daemon: Container 79086762910c273a3289c77e0234842eaf00d15b0f159f227563e8b8d4313575 is not running
+```
+<br><br>
+
+Althought I love to troubleshoot this type of thing, I would like to proceed with this chellenge creation.<br>
+So it's time to simply rebuild the container like I was going to do anyway in the end.<br>
+This is a good time to check if mysql kept everything I've done, along with the wp-config files.<br>
+This is also why I keep making those bash scripts to run everything for me. <br>
+
+```
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/www$ sudo ./runctfWPbuddypress.sh 
+5158aed4d0b638cb792eecb3fb3b4c4e6dfa1127f0ce9e73f7116ba2e301ac7d
+
+@ubuntu:~/Docker/ctf/Defaults/Scripts$ sudo ./find_container_ip.sh ctfWPbuddypresswww
+172.17.0.3
+```
+<br><br>
+Yep, everything's exactly the same.  I may as well rebuild the image acording to what I want at this point.<br>
+need to add vim and the php.ini file.  I know there's an easier way, but using this for now.<br>
+
+```
+ADDED TO dockerfile
+
+# UPDATE PHP.INI FILE
+RUN echo "  " >> /etc/php/7.4/apache2/php.ini
+RUN echo "upload_max_filesize = 200M" >> /etc/php/7.4/apache2/php.ini
+RUN echo "post_max_size = 200M" >> /etc/php/7.4/apache2/php.ini
+RUN echo "memory_limit = 500M" >> /etc/php/7.4/apache2/php.ini 
+RUN echo "max_execution_time = 600" >> /etc/php/7.4/apache2/php.ini
+RUN echo "max_input_vars = 1000" >> /etc/php/7.4/apache2/php.ini
+RUN echo "max_input_time = 400" >>/etc/php/7.4/apache2/php.ini
+```
+<br><br>
+And now the upload worked...<br>
+<br>
+
+<img src="../../images/buddy_upload_success.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
 <hr>
 
 ## THE YML (OR YAML) FILE
