@@ -1207,9 +1207,15 @@ I don't feel like there's any need for a dockerfile for MySQL... just use the RU
 <br><br>
 
 Running the container requires you to specify the root password and some other things, so keep that in mind.<br>
+By the way, I simply made a bash scrip to run that docker RUN command... easier that way.<br>
 But all connections were solid:<br>
 
 ```
+@ubuntu:~/Docker/ctf/ctfmysql$ vim runctfmysql.sh
+@ubuntu:~/Docker/ctf/ctfmysql$ chmod +x runctfmysql.sh
+@ubuntu:~/Docker/ctf/ctfmysql$ sudo ./runctfmysql.sh
+
+
 @ubuntu:~/Docker/ctf/ctfmysql$ mysql -uroot -ptestpassword -h127.0.0.1 -P6603 
 mysql: [Warning] Using a password on the command line interface can be insecure.
 Welcome to the MySQL monitor.  Commands end with ; or \g.
