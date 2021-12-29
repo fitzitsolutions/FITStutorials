@@ -1439,7 +1439,7 @@ Error response from daemon: Container 79086762910c273a3289c77e0234842eaf00d15b0f
 ```
 <br><br>
 
-Althought I love to troubleshoot this type of thing, I would like to proceed with this chellenge creation.<br>
+Although I love to troubleshoot this type of thing, I would like to proceed with this chellenge creation.<br>
 So it's time to simply rebuild the container like I was going to do anyway in the end.<br>
 This is a good time to check if mysql kept everything I've done, along with the wp-config files.<br>
 This is also why I keep making those bash scripts to run everything for me. <br>
