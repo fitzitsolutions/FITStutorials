@@ -1334,7 +1334,7 @@ Query OK, 0 rows affected (0.00 sec)
 ```
 
 <br><br>
-When running the Apache docker, I see that although I changed the permissions on the host, they're not changed on the dontainer.<br>
+When running the Apache docker, I see that although I changed the permissions on the host, they're not changed on the container.<br>
 I can use the same script to take care of this...<br>
 Also, I figured out that I didn't install vim into the image... need to fix that (my favorite editor)<br>
 <br><br>
