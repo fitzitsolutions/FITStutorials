@@ -1144,7 +1144,7 @@ Time to build an image and container for MySQL... pretty sure one already exists
 <br><br>
 NO REALLY... NOW I'M DONE FOR THE NIGHT!  WILL DO MORE TOMORROW...
 <br><br>
-Back to it... going to finish this today!<br>
+Back to it (it's the next morning)... going to finish this today!<br>
 NOTE: The /etc/hosts addition will come in handy:<br>
 
 ```
