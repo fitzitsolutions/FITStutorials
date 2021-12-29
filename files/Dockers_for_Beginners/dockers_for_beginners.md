@@ -1580,7 +1580,7 @@ RUN a2enmod rewrite
 
 <br>
 
-<img src="../../images/redirect_not_enabled.png" alt="php_screenshot" style="width:400px;"/>
+<img src="../../images/apache_good_redirect.png" alt="php_screenshot" style="width:400px;"/>
 
 <br><br>
 And now the redirect works... (green background).<br>
