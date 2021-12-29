@@ -1650,9 +1650,14 @@ tpz{flag}
 http://172.17.0.3/wp-content/uploads/2021/12/cve202121389.php?cmd=cat /home/tpzuser/user.txt
 [+] Done!
 ```
+<br><br>
 
 <hr>
 
-## THE YML (OR YAML) FILE
-You can orchestrate multiple docker containers using a .yml file
-<br>
+## CHALLENGE CREATED
+### It'll be ready to deply after I've changed the easy passwords.
+I hope you've enjoyed this as much as me!  I'll probably create some docker-compose files to automate this,<br>
+but it's awesome to see the raw learning experience from start to finish.<br>
+If you're up for it, go create some dockers and challenges! Have fun with this... it's awesome!<br>
+
+<hr>
