@@ -57,6 +57,14 @@ sudo apt purge package_name [REMOVE A SERVICE]
 </pre>
 <br>
 
+### HIGHLY RECOMMEND CHANGING THE MYSQL 
+This is to ensure your log files don't fill up your hard drive.<br>
+<pre>
+mysql> SET GLOBAL binlog_expire_logs_seconds = 259200;
+</pre>
+
+<br>
+
 <hr>
 
 ## THIS IS THE END OF THE COMMON CONFIGURATIONS
