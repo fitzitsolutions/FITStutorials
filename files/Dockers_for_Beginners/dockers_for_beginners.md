@@ -1042,9 +1042,7 @@ Now that we have a good environment with apache running and files that can be ch
 The logical next step would be to create the mysql container and link it... but that'll be during chellenge development.<br>
 This should involve creating the user, and giving them permission to run commands (perhaps GTFObins accessible?)<br>
 <br><br>
-I came across this in 
-
-[Docker Docs](https://docs.docker.com/engine/reference/builder/#syntax)<br>
+I came across this in [Docker Docs](https://docs.docker.com/engine/reference/builder/#syntax)<br>
 
 but it mods a directory... same with chown and other commands using ADD... see documentation
 
@@ -1062,7 +1060,7 @@ The USER instruction sets the user name (or UID) and optionally the user group (
 <br><br>
 It looks like you create the user, and run commands by the user after...<br>
 Each of these dockerfile instructions run in order... so I plan to use that.<br>
-A fun thing to use for thise type of thing would be ENV variables for user working directories.<br>
+A fun note to use for thise type of thing would be ENV variables for user working directories.<br>
 <br>
 It should be pretty easy to put all of this together...<br>
 <br>
@@ -1146,7 +1144,7 @@ Time to build an image and container for MySQL... pretty sure one already exists
 <br><br>
 NO REALLY... NOW I'M DONE FOR THE NIGHT!  WILL DO MORE TOMORROW...
 <br><br>
-Back to it...<br>
+Back to it... going to finish this today!<br>
 NOTE: The /etc/hosts addition will come in handy:<br>
 
 ```
