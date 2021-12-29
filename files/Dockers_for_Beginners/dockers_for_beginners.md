@@ -453,16 +453,16 @@ local     c91aa53a910bf26b3838b1c455c1699e3bc36a4f23af5a5ab832ad9b32f95bb3
 
 <br>
 I can use docker volume prune to remove any unused volumes, <br>
-and docker volume rm to remove used ones. <br>>
+and docker volume rm to remove used ones. <br>
 ...but at this point, I'm wondering how the used ones are attached to containers.<br>
 it would seem that if a container was built and run, the volume is associated with that container. <br>
 ...makes sense, if I need the container, I need the volume that's supposed to be in it.<br>
 for this learning experience, I'll simply delete the container, and see what's left, then purge.
 <br><br>
 
-[Docker Docs](https://docs.docker.com/engine/reference/commandline/image_rm/) - Remove images
-[Docker Docs](https://docs.docker.com/engine/reference/commandline/rm/) - Remove containers
-[Docker Docs](https://docs.docker.com/engine/reference/commandline/volume_ls/) - Remove Volumes
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/image_rm/) - Remove images <br>
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/rm/) - Remove containers <br>
+[Docker Docs](https://docs.docker.com/engine/reference/commandline/volume_ls/) - Remove Volumes <br>
 
 <hr>
 
