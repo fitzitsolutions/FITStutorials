@@ -14,4 +14,4 @@
 10. [HAProxy_Build.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Firewalls/HAProxy_Build.txt) - HAProxy build in PFSense
 11. [Sangoma_VPN_Phone.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/PBX/Sangoma_VPN_Phone.txt) - Connect Sangoma phone to PBX via VPN
 12. [dockers_for_beginners.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Dockers_for_Beginners/dockers_for_beginners.md) - Creating a CTF using dockers
-13. [DVWA](WWW.GOOGLE.COM) - Damn Vulnerable Web App Installation
+13. [DVWA](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/DVWA/DVWA_install.md) - Damn Vulnerable Web App Installation
