@@ -236,6 +236,8 @@ sudo mkdir /root/Log
 wget https://raw.githubusercontent.com/fitzitsolutions/FITStutorials/main/files/Ubuntu_Web_Server_Scripts/create_new_website.sh
 chmod +x create_new_website.sh
 sudo ./create_new_website.sh
+wget https://raw.githubusercontent.com/fitzitsolutions/FITStutorials/main/files/Ubuntu_Web_Server_Scripts/changeperms.sh
+sudo ./changeperms.sh <your new website>
 </pre>
 <br>
 
