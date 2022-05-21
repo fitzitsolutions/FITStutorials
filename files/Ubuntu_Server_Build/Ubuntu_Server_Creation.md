@@ -57,11 +57,23 @@ sudo apt purge package_name [REMOVE A SERVICE]
 </pre>
 <br>
 
-### HIGHLY RECOMMEND CHANGING THE MYSQL 
+### HIGHLY RECOMMEND CHANGING MYSQL BIN LOGGING SETTING
 This is to ensure your log files don't fill up your hard drive.<br>
+The transaction logs can and will stop your server from working... <br>
+
 <pre>
+SET BIN LOG EXPIRATION - METHOD 1
 mysql> SET GLOBAL binlog_expire_logs_seconds = 259200;
+
+TURN OFF BIN LOGGING (DO NOT DO THIS IF USING REPLICATION) - METHOD 2
+Add this to the /etc/mysql/my.cnf
+
+[mysqld]
+disable_log_bin
 </pre>
+
+<br>
+
 
 <br>
 
