@@ -15,3 +15,4 @@
 11. [Sangoma_VPN_Phone.txt](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/PBX/Sangoma_VPN_Phone.txt) - Connect Sangoma phone to PBX via VPN
 12. [dockers_for_beginners.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Dockers_for_Beginners/dockers_for_beginners.md) - Creating a CTF using dockers
 13. [DVWA](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/DVWA/DVWA_install.md) - Damn Vulnerable Web App Installation
+14. [Hard_Drive_Full_Tutorial](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Hard_Drive_Full_Fix/hd_fix.md) - VM Hard Drive Full (won't boot) fix
