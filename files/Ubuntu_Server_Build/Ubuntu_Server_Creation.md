@@ -70,6 +70,11 @@ Add this to the /etc/mysql/my.cnf
 
 [mysqld]
 disable_log_bin
+
+YOU CAN ALSO PURGE THE LOGS PERIODICALLY
+mysql> show binary logs;
+mysql> PURGE BINARY LOGS BEFORE '2022-05-25 01:01:01';
+mysql> show binary logs;
 </pre>
 
 <br>
