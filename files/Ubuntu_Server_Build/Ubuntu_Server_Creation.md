@@ -145,6 +145,7 @@ sudo a2enmod headers
 sudo a2enmod rewrite [this is for permalinks]
 sudo apt install php php-cli php-fpm php-json php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath php-curl php-json php-cgi php-mysql
 sudo apt install mysql-server
+[optional] sudo mysql -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'mynewpassword';
 sudo mysql_secure_installation
 </pre>
 <br>
