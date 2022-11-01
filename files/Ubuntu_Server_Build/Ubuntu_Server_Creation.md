@@ -184,16 +184,22 @@ sudo systemctl restart apache2
 ### PHP 
 
 #### OLDER PHP VERSIONS [WORDPRESS COMPATIBILITY]
+<pre>
 sudo apt update && sudo apt upgrade
 sudo apt install software-properties-common
 sudo add-apt-repository ppa:ondrej/php -y
 sudo apt install php7.4
 sudo apt install php7.4-{cli,common,curl,zip,gd,mysql,xml,mbstring,json,intl}
+</pre>
 NOTE: Need to make sure 7.4 is the default if multiple versions are installed
+<pre>
 sudo update-alternatives --config php
+</pre>
 NOTE: you can un-install 7.4 using these commands:
+<pre>
 sudo apt autoremove --purge php7.4
 sudo add-apt-repository --remove ppa:ondrej/php -y
+</pre>
 
 #### PHP CONFIGURATIONS [PHP]
 <pre>
