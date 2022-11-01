@@ -160,7 +160,7 @@ sudo mysql_secure_installation
 <br>
 
 ### APACHE CONFIGURATIONS 
-#### FILE: /etc/apache2/apache2.conf [APACHE]
+#### EDIT FILE: /etc/apache2/apache2.conf [APACHE]
 <pre>
 KeepAlive On
 MaxKeepAliveRequests 50
@@ -168,7 +168,7 @@ KeepAliveTimeout 5
 </pre>
 <br>
 
-#### FILE: /etc/apache2/mods-available/mpm_prefork.conf [APACHE]
+#### EXIT FILE: /etc/apache2/mods-available/mpm_prefork.conf [APACHE]
 <pre>
 &ltIfModule mpm_prefork_module>
         StartServers            4
@@ -210,7 +210,7 @@ sudo apt autoremove --purge php7.4
 sudo add-apt-repository --remove ppa:ondrej/php -y
 </pre>
 
-#### PHP CONFIGURATIONS [PHP]
+#### EDIT FILE: /etc/php/version/apache2/php.ini [PHP]
 <pre>
 upload_max_filesize = 200M
 post_max_size = 200M
