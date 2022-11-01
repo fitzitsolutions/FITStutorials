@@ -134,24 +134,33 @@ ufw enable
 <br>
 <br>
 
-### LAMP STACK - QUICK - Linux, Apache, MySQL, PHP [LAMP]
+### APACHE / MYSQL INSTALLATION
+#### LAMP STACK - QUICK - Linux, Apache, MySQL, PHP [LAMP]
 <pre>
 sudo apt install tasksel
 sudo tasksel install lamp-server
-[OPTIONAL - manual installation]
+</pre>
+#### OPTIONAL - manual installation
+<pre>
 sudo apt install apache2
 sudo a2enmod ssl
 sudo a2enmod headers
 sudo a2enmod rewrite [this is for permalinks]
 sudo apt install php php-cli php-fpm php-json php-common php-mysql php-zip php-gd php-mbstring php-curl php-xml php-pear php-bcmath php-curl php-json php-cgi php-mysql
 sudo apt install mysql-server
-[optional] sudo mysql -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'mynewpassword';
+</pre>
+#### OPTIONAL - MYSQL ROOT USER PASSWORD CHANGE [MYSQL]
+<pre>
+sudo mysql -- ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password by 'mynewpassword';
+</pre>
+#### OPTIONAL - SECURE MYSQL INSTALLATION - RECOMMENDED [MYSQL]
+<pre>
 sudo mysql_secure_installation
 </pre>
 <br>
 
-### APACHE CONFIGURATIONS [APACHE]
-#### FILE: /etc/apache2/apache2.conf
+### APACHE CONFIGURATIONS 
+#### FILE: /etc/apache2/apache2.conf [APACHE]
 <pre>
 KeepAlive On
 MaxKeepAliveRequests 50
@@ -159,7 +168,7 @@ KeepAliveTimeout 5
 </pre>
 <br>
 
-#### FILE: /etc/apache2/mods-available/mpm_prefork.conf
+#### FILE: /etc/apache2/mods-available/mpm_prefork.conf [APACHE]
 <pre>
 &ltIfModule mpm_prefork_module>
         StartServers            4
@@ -183,7 +192,7 @@ sudo systemctl restart apache2
 
 ### PHP 
 
-#### OLDER PHP VERSIONS [WORDPRESS COMPATIBILITY]
+#### INSTALL OLDER PHP VERSIONS [PHP WORDPRESS COMPATIBILITY]
 <pre>
 sudo apt update && sudo apt upgrade
 sudo apt install software-properties-common
@@ -212,6 +221,7 @@ max_input_time = 400
 </pre>
 <br>
 
+### WEBSITE
 #### CREATE A WEBSITE [WEBSITE]
 <pre>
 sudo cp /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/example.com.conf
