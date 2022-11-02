@@ -1,8 +1,50 @@
 # UBUNTU 20.04 BUILD ON LINODE
 
+## QUICK REFERENCE
+<pre>
+apt-get update && apt-get upgrade
+hostnamectl set-hostname example-hostname
+dpkg-reconfigure tzdata
+adduser example_user
+usermod -aG sudo example_user
+sudo ufw enable
+sudo ufw logging on
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+sudo apt-get install openssh-server apache2 mysql-server curl unzip vim
+
+NOTE: the following command installs the latest PHP.  See below to install older versions
+sudo apt install php-{cli,common,curl,zip,gd,mysql,xml,mbstring,json,intl}
+
+EDIT FILE: /etc/apache2/apache2.conf
+KeepAlive On
+MaxKeepAliveRequests 50
+KeepAliveTimeout 5
+
+EDIT FILE: /etc/apache2/mods-available/mpm_prefork.conf
+<IfModule mpm_prefork_module>
+        StartServers            4
+        MinSpareServers         3
+        MaxSpareServers         40
+        MaxRequestWorkers       200
+        MaxConnectionsPerChild  10000
+</IfModule>
+
+EDIT FILE: /etc/php/version/apache2/php.ini
+upload_max_filesize = 200M
+post_max_size = 200M
+memory_limit = 500M
+max_execution_time = 600
+max_input_vars = 1000
+max_input_time = 400
+</pre>
+
+<hr>
+
+## STEPS AMPLIFIED WITH ADDITIONS FOR WEBSITES AND EMAILS
+
 ## ALL SERVERS [common configurations]
-<br>
-<br>
 
 ### UPDATE SERVER [UPDATE]
 <pre>
