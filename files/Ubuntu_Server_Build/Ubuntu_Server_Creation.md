@@ -23,13 +23,13 @@ MaxKeepAliveRequests 50
 KeepAliveTimeout 5
 
 EDIT FILE: /etc/apache2/mods-available/mpm_prefork.conf
-<IfModule mpm_prefork_module>
+&ltIfModule mpm_prefork_module>
         StartServers            4
         MinSpareServers         3
         MaxSpareServers         40
         MaxRequestWorkers       200
         MaxConnectionsPerChild  10000
-</IfModule>
+&lt/IfModule>
 
 EDIT FILE: /etc/php/version/apache2/php.ini
 upload_max_filesize = 200M
