@@ -38,6 +38,11 @@ memory_limit = 500M
 max_execution_time = 600
 max_input_vars = 1000
 max_input_time = 400
+
+NOTE: enable Apache2 mods for wordpress if needed
+sudo a2enmod ssl
+sudo a2enmod headers
+sudo a2enmod rewrite [this is for permalinks]
 </pre>
 
 <hr>
