@@ -43,6 +43,8 @@ NOTE: enable Apache2 mods for wordpress if needed
 sudo a2enmod ssl
 sudo a2enmod headers
 sudo a2enmod rewrite [this is for permalinks]
+sudo a2dismod mpm_event [swapped for mpm_prefork]
+sudo a2enmod mpm_prefork [enabled to replace mpm_event]
 </pre>
 
 <hr>
