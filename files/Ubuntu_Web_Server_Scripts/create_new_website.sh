@@ -7,8 +7,8 @@
 DAY=$(date +%u)
 DATE=$(date +%Y%b%d-%T)
 DATE2=$(date +%Y%m%d)
-MPASS=$(head -n 1 /root/sql_mysql.txt)
-WPASS=$(head -n 1 /root/sql_wordpress.txt)
+# MPASS=$(head -n 1 /root/sql_mysql.txt)
+# WPASS=$(head -n 1 /root/sql_wordpress.txt)
 DBNAMESHORT="EMPTY"
 DBNAME="EMPTY"
 DBUSER="EMPTY"
@@ -57,7 +57,7 @@ DBNAMESHORT=${varwebpagename1//./_}
 # DBNAMESHORT=${varwebpagename1%.*}
 DBNAME="${DBNAMESHORT}_${DATE2}"
 DBUSER="FITS_${DBNAMESHORT}"
-DBUSERPASS="${WPASS}_${varwebpagename1}_${RANDOM2}"
+DBUSERPASS="${DATE2}_${varwebpagename1}_${RANDOM2}"
 DBPREFIX="${DBNAMESHORT}_"
 
 ## ==== CREATE APACHE FOLDERS
@@ -273,16 +273,17 @@ sleep 1
 
 ## ==== SAVE CONFIGURATIONS TO FILE
 
+mkdir /root/Log
 echo "DAY = $DAY"                    >> /root/Log/website_creation_$DBNAMESHORT.log
 echo "DAY = $DAY"
 echo "DATE = $DATE"                  >> /root/Log/website_creation_$DBNAMESHORT.log
 echo "DATE = $DATE"
 echo "DATE2 = $DATE2"                >> /root/Log/website_creation_$DBNAMESHORT.log
 echo "DATE2 = $DATE2"
-echo "MPASS = $MPASS"                >> /root/Log/website_creation_$DBNAMESHORT.log
-echo "MPASS = $MPASS"
-echo "WPASS = $WPASS"                >> /root/Log/website_creation_$DBNAMESHORT.log
-echo "WPASS = $WPASS"
+# echo "MPASS = $MPASS"                >> /root/Log/website_creation_$DBNAMESHORT.log
+# echo "MPASS = $MPASS"
+# echo "WPASS = $WPASS"                >> /root/Log/website_creation_$DBNAMESHORT.log
+# echo "WPASS = $WPASS"
 echo "DBNAMESHORT = $DBNAMESHORT"    >> /root/Log/website_creation_$DBNAMESHORT.log
 echo "DBNAMESHORT = $DBNAMESHORT"
 echo "DBNAME = $DBNAME"              >> /root/Log/website_creation_$DBNAMESHORT.log
