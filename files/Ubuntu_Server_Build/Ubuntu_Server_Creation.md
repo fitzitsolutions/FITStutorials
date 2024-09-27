@@ -16,13 +16,11 @@ sudo apt-get install openssh-server apache2 mysql-server curl unzip vim
 
 sudo mysql_secure_installation
 
-sudo a2enmod ssl
-sudo a2enmod headers
-sudo a2enmod rewrite [this is for permalinks]
-
 NOTE: the following command installs the latest PHP.  See below to install older versions
 sudo apt install php-{cli,common,curl,zip,gd,mysql,xml,mbstring,json,intl}
 
+sudo apt install php libapache2-mod-php
+        
 EDIT FILE: /etc/apache2/apache2.conf
 KeepAlive On
 MaxKeepAliveRequests 50
