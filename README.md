@@ -17,7 +17,7 @@
 13. [DVWA](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/DVWA/DVWA_install.md) - Damn Vulnerable Web App Installation
 14. [Hard_Drive_Full_Tutorial](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/Hard_Drive_Full_Fix/hd_fix.md) - VM Hard Drive Full (won't boot) fix
 15. [Hashcat_Benchmark.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/hashcat_benchmark.md) - 3080ti/2080ti on Kali
-16. [Guacamole_build.md](https://github.com/fitzitsolutions/FITStutorials/blob/main/files/guacamole_build.md) - Automate building Guacamole on multiple OSs
+16. [Guacamole_build.md]([https://github.com/fitzitsolutions/FITStutorials/blob/main/files/guacamole_build.md) - Automate building Guacamole on multiple OSs
 
 <br><br>
 
